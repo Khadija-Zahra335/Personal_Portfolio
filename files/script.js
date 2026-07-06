@@ -1,20 +1,24 @@
 /* ==========================================================================
-   PORTFOLIO SCRIPT
-   - Renders all content from SITE_DATA (Firebase Firestore if connected,
-     otherwise DEFAULT_DATA from data.js)
-   - Preserves original behaviors: typewriter, scrollspy, reveals, counters,
-     progress bars, project filters, toasts
-   - Admin panel: Ctrl+Shift+A, tapping the logo 5 times, or opening #admin
+   PORTFOLIO SCRIPT — Khadija Zahra
+   - Renders all content from SITE_DATA (Firestore if connected, else data.js)
+   - Bilingual name typewriter (English + Urdu) + rotating roles typewriter
+   - Experience timeline, chip-based skills, light/dark theme toggle
+   - Admin panel: Ctrl+Shift+A, 5 logo taps, or #admin
+     Live mode  -> Firebase email login + "forgot password" reset email
+     Export mode -> passcode gate + downloads updated data.js
    ========================================================================== */
 
 let SITE_DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
 let db = null;
 let auth = null;
 let firebaseEnabled = false;
+let passcodeUnlocked = false;
 
 const esc = (s) => String(s == null ? "" : s)
   .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
   .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+
+const $ = (id) => document.getElementById(id);
 
 // ==========================================================================
 // Firebase bootstrap (safe no-op until configured)
@@ -36,47 +40,92 @@ async function loadContent() {
   if (!firebaseEnabled) return;
   try {
     const snap = await db.collection("site").doc("content").get();
-    if (snap.exists) {
-      SITE_DATA = Object.assign({}, DEFAULT_DATA, snap.data());
-    }
+    if (snap.exists) SITE_DATA = Object.assign({}, DEFAULT_DATA, snap.data());
   } catch (e) {
     console.warn("Using default data (Firestore read failed):", e);
   }
 }
 
 // ==========================================================================
-// Render functions — inject SITE_DATA into the existing layout
+// Theme toggle (light / dark, persisted)
+// ==========================================================================
+function initTheme() {
+  const saved = localStorage.getItem("kz-theme");
+  if (saved === "light") document.body.classList.add("light");
+  updateThemeIcon();
+  $("theme-toggle").addEventListener("click", () => {
+    document.body.classList.toggle("light");
+    localStorage.setItem("kz-theme", document.body.classList.contains("light") ? "light" : "dark");
+    updateThemeIcon();
+  });
+}
+// ==========================================================================
+// Color palette switcher (persisted; admin can set the default)
+// ==========================================================================
+const PALETTES = [
+  { key: "neon",      name: "Bluish Neon" },
+  { key: "porcelain", name: "Porcelain Blue" },
+  { key: "lavender",  name: "Lavender Veil" },
+  { key: "plasma",    name: "Plasma Violet" }
+];
+
+function applyPalette(key) {
+  const valid = PALETTES.some(p => p.key === key) ? key : "neon";
+  if (valid === "neon") document.body.removeAttribute("data-palette");
+  else document.body.setAttribute("data-palette", valid);
+}
+
+function initPalette() {
+  const saved = localStorage.getItem("kz-palette");
+  const fallback = (SITE_DATA.settings && SITE_DATA.settings.defaultPalette) || "neon";
+  applyPalette(saved || fallback);
+
+  $("palette-toggle").addEventListener("click", () => {
+    const current = document.body.getAttribute("data-palette") || "neon";
+    const idx = PALETTES.findIndex(p => p.key === current);
+    const next = PALETTES[(idx + 1) % PALETTES.length];
+    applyPalette(next.key);
+    localStorage.setItem("kz-palette", next.key);
+    showToast("Color theme: " + next.name);
+  });
+}
+
+function updateThemeIcon() {
+  const isLight = document.body.classList.contains("light");
+  $("theme-toggle").innerHTML = `<i data-lucide="${isLight ? "moon" : "sun"}"></i>`;
+  lucide.createIcons();
+}
+
+// ==========================================================================
+// Render functions
 // ==========================================================================
 function renderAll() {
   const d = SITE_DATA;
-  const fullName = [d.profile.firstName, d.profile.lastName].filter(Boolean).join(" ");
 
   // Header / hero
-  document.getElementById("logo-first").textContent = d.profile.firstName || "";
-  document.getElementById("logo-last").textContent = d.profile.lastName || "";
-  document.getElementById("badge-text").textContent = d.profile.badge || "";
-  document.getElementById("hero-name").textContent = fullName;
-  document.getElementById("hero-description").textContent = d.profile.heroDescription || "";
-  const avatar = document.getElementById("avatar-img");
+  $("logo-first").textContent = d.profile.logoFirst || "";
+  $("logo-last").textContent = d.profile.logoLast || "";
+  $("badge-text").textContent = d.profile.badge || "";
+  $("hero-description").textContent = d.profile.heroDescription || "";
+  const avatar = $("avatar-img");
   if (d.profile.avatar) avatar.src = d.profile.avatar;
-  avatar.alt = fullName + " Portrait";
-  document.title = fullName + " | Creative Full-Stack Developer";
+  avatar.alt = (d.profile.names && d.profile.names[0] ? d.profile.names[0] : "Portrait");
+  document.title = (d.profile.names && d.profile.names[0] ? d.profile.names[0] : "Portfolio") + " | Full Stack Developer";
 
   // Stats
-  document.getElementById("stats-grid").innerHTML = d.stats.map(s => `
+  $("stats-grid").innerHTML = d.stats.map(s => `
     <div class="stat-card">
       <h3 class="stat-number" data-target="${Number(s.value) || 0}" data-suffix="${esc(s.suffix || "")}">0</h3>
       <p class="stat-label">${esc(s.label)}</p>
     </div>`).join("");
 
   // About
-  document.getElementById("about-subtitle").textContent = d.about.subtitle || "";
-  document.getElementById("about-title").textContent = d.about.title || "";
-  document.getElementById("about-paragraphs").innerHTML =
-    d.about.paragraphs.map(p => `<p>${esc(p)}</p>`).join("");
-  document.getElementById("about-location").textContent = d.about.location || "";
-  document.getElementById("about-email").textContent = d.about.email || "";
-  document.getElementById("about-cards").innerHTML = d.about.features.map(f => `
+  $("about-subtitle").textContent = d.about.subtitle || "";
+  $("about-title").textContent = d.about.title || "";
+  $("about-paragraphs").innerHTML = d.about.paragraphs.map(p => `<p>${esc(p)}</p>`).join("");
+  $("about-location").textContent = d.about.location || "";
+  $("about-email").textContent = d.about.email || "";
+  $("about-cards").innerHTML = d.about.features.map(f => `
     <div class="about-feature-card">
       <div class="card-icon-wrapper">
         <i data-lucide="${esc(f.icon || "star")}" class="card-icon"></i>
@@ -85,8 +134,19 @@ function renderAll() {
       <p>${esc(f.text)}</p>
     </div>`).join("");
 
+  // Experience timeline
+  $("experience-timeline").innerHTML = (d.experience || []).map(x => `
+    <div class="timeline-item">
+      <div class="timeline-head">
+        <span class="timeline-role">${esc(x.role)}</span>
+        <span class="timeline-period">${esc(x.period)}</span>
+      </div>
+      <div class="timeline-company">${esc(x.company)}</div>
+      <p>${esc(x.description)}</p>
+    </div>`).join("");
+
   // Project filters
-  document.getElementById("filter-container").innerHTML =
+  $("filter-container").innerHTML =
     `<button class="filter-btn active" data-filter="all">All</button>` +
     d.categories.map(c =>
       `<button class="filter-btn" data-filter="${esc(c.key)}">${esc(c.label)}</button>`).join("");
@@ -96,10 +156,11 @@ function renderAll() {
     const c = d.categories.find(c => c.key === key);
     return c ? c.label : key;
   };
-  document.getElementById("projects-grid").innerHTML = d.projects.map(p => {
+  $("projects-grid").innerHTML = d.projects.map(p => {
+    const g = [1, 2, 3, 4].includes(Number(p.gradient)) ? Number(p.gradient) : 1;
     const visual = p.image
       ? `<img src="${esc(p.image)}" alt="${esc(p.title)}">`
-      : `<div class="custom-card-bg bg-gradient-${p.gradient === 2 ? 2 : 1}">
+      : `<div class="custom-card-bg bg-gradient-${g}">
            <i data-lucide="${esc(p.icon || "sparkles")}" class="bg-icon"></i>
          </div>`;
     const links = [];
@@ -126,41 +187,70 @@ function renderAll() {
     </div>`;
   }).join("");
 
-  // Skills
-  document.getElementById("skills-grid").innerHTML = d.skills.map(group => `
-    <div class="skills-category-card">
-      <h3>${esc(group.category)}</h3>
-      <ul class="skills-list">
-        ${group.items.map(item => `
-        <li>
-          <div class="skill-info">
-            <span>${esc(item.name)}</span>
-            <span>${Number(item.level) || 0}%</span>
-          </div>
-          <div class="progress-bar-bg">
-            <div class="progress-bar" style="width: ${Number(item.level) || 0}%"></div>
-          </div>
-        </li>`).join("")}
-      </ul>
+  // Skills — chip cards, no percentage bars
+  $("skills-grid").innerHTML = d.skills.map(group => `
+    <div class="skill-chip-card">
+      <div class="skill-chip-head">
+        <span class="skill-chip-icon"><i data-lucide="${esc(group.icon || "star")}"></i></span>
+        <h3>${esc(group.category)}</h3>
+      </div>
+      <div class="skill-chips">
+        ${(group.items || []).map(item => `<span class="skill-chip">${esc(item)}</span>`).join("")}
+      </div>
     </div>`).join("");
 
   // Contact + footer
-  document.getElementById("contact-heading").textContent = d.contact.heading || "";
-  document.getElementById("contact-text").textContent = d.contact.text || "";
-  document.getElementById("social-links").innerHTML = d.contact.socials.map(s => `
+  $("contact-heading").textContent = d.contact.heading || "";
+  $("contact-text").textContent = d.contact.text || "";
+  $("social-links").innerHTML = d.contact.socials.map(s => `
     <a href="${esc(s.url || "#")}" target="_blank" rel="noopener" class="social-icon-btn" aria-label="${esc(s.icon)}">
       <i data-lucide="${esc(s.icon)}"></i>
     </a>`).join("");
-  document.getElementById("footer-copy").textContent = d.footer.copyright || "";
+  $("footer-copy").textContent = d.footer.copyright || "";
 
-  if (typeof lucide !== "undefined") lucide.createIcons();
+  lucide.createIcons();
 }
 
 // ==========================================================================
-// Original site behaviors (initialized AFTER rendering)
+// Typewriter factory (used for both the name and the roles)
+// ==========================================================================
+function makeTypewriter(el, words, opts = {}) {
+  if (!el || !words || !words.length) return;
+  const typeSpeed = opts.typeSpeed || 100;
+  const deleteSpeed = opts.deleteSpeed || 50;
+  const holdTime = opts.holdTime || 2200;
+  const gapTime = opts.gapTime || 500;
+  let wordIndex = 0, charIndex = 0, isDeleting = false;
+
+  function tick() {
+    const currentWord = words[wordIndex];
+    let delay;
+    if (isDeleting) {
+      charIndex--;
+      el.textContent = currentWord.substring(0, charIndex);
+      delay = deleteSpeed;
+    } else {
+      charIndex++;
+      el.textContent = currentWord.substring(0, charIndex);
+      delay = typeSpeed;
+    }
+    if (!isDeleting && charIndex === currentWord.length) {
+      isDeleting = true;
+      delay = holdTime;
+    } else if (isDeleting && charIndex === 0) {
+      isDeleting = false;
+      wordIndex = (wordIndex + 1) % words.length;
+      delay = gapTime;
+    }
+    setTimeout(tick, delay);
+  }
+  tick();
+}
+
+// ==========================================================================
+// Site behaviors (initialized AFTER rendering)
 // ==========================================================================
 function initBehaviors() {
-  // --- Header Scroll Effect & Active Navigation Link Spy ---
   const header = document.querySelector(".header");
   const sections = document.querySelectorAll("section[id]");
   const navLinks = document.querySelectorAll(".nav-link");
@@ -172,9 +262,7 @@ function initBehaviors() {
 
     let current = "";
     sections.forEach(section => {
-      if (window.scrollY >= (section.offsetTop - 150)) {
-        current = section.getAttribute("id");
-      }
+      if (window.scrollY >= (section.offsetTop - 150)) current = section.getAttribute("id");
     });
     const updateActiveLink = (links) => {
       links.forEach(link => {
@@ -186,18 +274,15 @@ function initBehaviors() {
     updateActiveLink(mobileLinks);
   });
 
-  // --- Mobile Nav Drawer Toggle ---
-  const menuToggle = document.getElementById("menu-toggle");
-  const mobileNav = document.getElementById("mobile-nav");
+  // Mobile nav
+  const menuToggle = $("menu-toggle");
+  const mobileNav = $("mobile-nav");
   if (menuToggle && mobileNav) {
     menuToggle.addEventListener("click", () => {
       mobileNav.classList.toggle("open");
-      const icon = menuToggle.querySelector("i, svg");
-      if (icon) {
-        const isOpen = mobileNav.classList.contains("open");
-        menuToggle.innerHTML = `<i data-lucide="${isOpen ? "x" : "menu"}"></i>`;
-        lucide.createIcons();
-      }
+      const isOpen = mobileNav.classList.contains("open");
+      menuToggle.innerHTML = `<i data-lucide="${isOpen ? "x" : "menu"}"></i>`;
+      lucide.createIcons();
     });
     mobileLinks.forEach(link => {
       link.addEventListener("click", () => {
@@ -208,39 +293,15 @@ function initBehaviors() {
     });
   }
 
-  // --- Typewriter Text Effect (words come from SITE_DATA) ---
-  const typewriterSpan = document.getElementById("typewriter");
-  const words = (SITE_DATA.profile.typewriter && SITE_DATA.profile.typewriter.length)
-    ? SITE_DATA.profile.typewriter
-    : ["modern web experiences."];
-  let wordIndex = 0, charIndex = 0, isDeleting = false, typingSpeed = 100;
+  // Dual typewriters: bilingual name (slower, elegant) + rotating roles
+  makeTypewriter($("hero-name-type"), SITE_DATA.profile.names, {
+    typeSpeed: 120, deleteSpeed: 60, holdTime: 3000, gapTime: 600
+  });
+  makeTypewriter($("typewriter"), SITE_DATA.profile.roles, {
+    typeSpeed: 90, deleteSpeed: 45, holdTime: 2000, gapTime: 450
+  });
 
-  function type() {
-    if (!typewriterSpan) return;
-    const currentWord = words[wordIndex];
-    if (isDeleting) {
-      typewriterSpan.textContent = currentWord.substring(0, charIndex - 1);
-      charIndex--;
-      typingSpeed = 50;
-    } else {
-      typewriterSpan.textContent = currentWord.substring(0, charIndex + 1);
-      charIndex++;
-      typingSpeed = 100;
-    }
-    if (!isDeleting && charIndex === currentWord.length) {
-      isDeleting = true;
-      typingSpeed = 2000;
-    } else if (isDeleting && charIndex === 0) {
-      isDeleting = false;
-      wordIndex = (wordIndex + 1) % words.length;
-      typingSpeed = 500;
-    }
-    setTimeout(type, typingSpeed);
-  }
-  if (typewriterSpan) type();
-
-  // --- Scroll Reveal Observer ---
-  const revealElements = document.querySelectorAll(".scroll-reveal");
+  // Scroll reveal
   const revealObserver = new IntersectionObserver((entries, observer) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
@@ -249,15 +310,15 @@ function initBehaviors() {
       }
     });
   }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
-  revealElements.forEach(el => revealObserver.observe(el));
+  document.querySelectorAll(".scroll-reveal").forEach(el => revealObserver.observe(el));
 
-  // --- Statistics Counter Animation (suffix now data-driven) ---
+  // Stats counters
   const statNumbers = document.querySelectorAll(".stat-number");
   const animateStats = (statEl) => {
     const target = parseInt(statEl.getAttribute("data-target"), 10);
     const suffix = statEl.getAttribute("data-suffix") || "";
-    const duration = 2000, stepTime = 30;
-    const increment = target / (duration / stepTime);
+    const stepTime = 30;
+    const increment = target / (2000 / stepTime);
     let current = 0;
     const timer = setInterval(() => {
       current += increment;
@@ -282,56 +343,14 @@ function initBehaviors() {
     statsObserver.observe(statsSection);
   }
 
-  // --- Skills progress bar animation ---
-  const skillsSection = document.querySelector(".skills-section");
-  const progressBars = document.querySelectorAll(".progress-bar");
-  if (skillsSection) {
-    const skillsObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          progressBars.forEach(bar => {
-            const width = bar.style.width;
-            bar.style.width = "0";
-            setTimeout(() => { bar.style.width = width; }, 100);
-          });
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.3 });
-    skillsObserver.observe(skillsSection);
-  }
+  initFilterRebind();
 
-  // --- Projects Filtering System ---
-  const filterBtns = document.querySelectorAll(".filter-btn");
-  const projectCards = document.querySelectorAll(".project-card");
-  filterBtns.forEach(btn => {
-    btn.addEventListener("click", () => {
-      filterBtns.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      const filterValue = btn.getAttribute("data-filter");
-      projectCards.forEach(card => {
-        const category = card.getAttribute("data-category");
-        if (filterValue === "all" || category === filterValue) {
-          card.style.display = "flex";
-          setTimeout(() => {
-            card.style.opacity = "1";
-            card.style.transform = "scale(1)";
-          }, 50);
-        } else {
-          card.style.opacity = "0";
-          card.style.transform = "scale(0.9)";
-          setTimeout(() => { card.style.display = "none"; }, 300);
-        }
-      });
-    });
-  });
-
-  // --- Toast System and Form Submission ---
-  const contactForm = document.getElementById("contact-form");
+  // Contact form + toast
+  const contactForm = $("contact-form");
   if (contactForm) {
     contactForm.addEventListener("submit", (e) => {
       e.preventDefault();
-      const nameInput = document.getElementById("name");
+      const nameInput = $("name");
       const userName = nameInput ? nameInput.value : "there";
       const submitBtn = contactForm.querySelector('button[type="submit"]');
       const originalText = submitBtn.innerHTML;
@@ -349,8 +368,31 @@ function initBehaviors() {
   }
 }
 
+function initFilterRebind() {
+  const filterBtns = document.querySelectorAll(".filter-btn");
+  const projectCards = document.querySelectorAll(".project-card");
+  filterBtns.forEach(btn => {
+    btn.onclick = () => {
+      filterBtns.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      const filterValue = btn.getAttribute("data-filter");
+      projectCards.forEach(card => {
+        const category = card.getAttribute("data-category");
+        if (filterValue === "all" || category === filterValue) {
+          card.style.display = "flex";
+          setTimeout(() => { card.style.opacity = "1"; card.style.transform = "scale(1)"; }, 50);
+        } else {
+          card.style.opacity = "0";
+          card.style.transform = "scale(0.9)";
+          setTimeout(() => { card.style.display = "none"; }, 300);
+        }
+      });
+    };
+  });
+}
+
 function showToast(message, type = "success") {
-  const toastContainer = document.getElementById("toast-container");
+  const toastContainer = $("toast-container");
   if (!toastContainer) return;
   const toast = document.createElement("div");
   toast.className = `toast ${type}`;
@@ -371,17 +413,20 @@ function showToast(message, type = "success") {
 let workingData = null;
 let activeTab = "profile";
 
-const $ = (id) => document.getElementById(id);
-
 function openAdmin() {
   workingData = JSON.parse(JSON.stringify(SITE_DATA));
   $("admin-overlay").classList.add("open");
   $("admin-mode-badge").textContent = firebaseEnabled ? "Live mode" : "Export mode";
-  if (firebaseEnabled && !auth.currentUser) {
-    $("admin-login").style.display = "block";
-    $("admin-editor").style.display = "none";
+  $("admin-passcode").style.display = "none";
+  $("admin-login").style.display = "none";
+  $("admin-editor").style.display = "none";
+
+  if (firebaseEnabled) {
+    if (auth.currentUser) showEditor();
+    else $("admin-login").style.display = "block";
   } else {
-    showEditor();
+    if (passcodeUnlocked) showEditor();
+    else $("admin-passcode").style.display = "block";
   }
   lucide.createIcons();
 }
@@ -392,6 +437,7 @@ function closeAdmin() {
 }
 
 function showEditor() {
+  $("admin-passcode").style.display = "none";
   $("admin-login").style.display = "none";
   $("admin-editor").style.display = "block";
   $("admin-save").style.display = firebaseEnabled ? "inline-flex" : "none";
@@ -399,7 +445,7 @@ function showEditor() {
   renderTab(activeTab);
 }
 
-// ---- Form building helpers ----
+// ---- Form building helper ----
 function field(label, value, path, type = "text") {
   if (type === "textarea") {
     return `<div class="admin-field"><label>${esc(label)}</label>
@@ -418,11 +464,12 @@ function renderTab(tab) {
 
   if (tab === "profile") {
     c.innerHTML =
-      field("First name (gradient part of logo)", d.profile.firstName, "profile.firstName") +
-      field("Last name (plain part of logo — optional)", d.profile.lastName, "profile.lastName") +
+      field("Names for the hero typewriter (one per line — English, Urdu, any script)", d.profile.names.join("\n"), "profile.names", "textarea") +
+      field("Logo — gradient part", d.profile.logoFirst, "profile.logoFirst") +
+      field("Logo — plain part", d.profile.logoLast, "profile.logoLast") +
       field("Hero badge text", d.profile.badge, "profile.badge") +
-      field("Typewriter phrases (one per line)", d.profile.typewriter.join("\n"), "profile.typewriter", "textarea") +
-      field("Hero description", d.profile.heroDescription, "profile.heroDescription", "textarea") +
+      field("Rotating roles (one per line)", d.profile.roles.join("\n"), "profile.roles", "textarea") +
+      field("Hero description / bio", d.profile.heroDescription, "profile.heroDescription", "textarea") +
       field("Avatar image URL / path", d.profile.avatar, "profile.avatar");
   }
 
@@ -437,11 +484,26 @@ function renderTab(tab) {
         <div class="admin-item-card">
           <div class="admin-item-head"><span>Feature card ${i + 1}</span></div>
           <div class="admin-row">
-            ${field("Icon (lucide name, e.g. cpu, palette, rocket)", f.icon, `about.features.${i}.icon`)}
+            ${field("Icon (lucide name: layers, brain-circuit, rocket…)", f.icon, `about.features.${i}.icon`)}
             ${field("Title", f.title, `about.features.${i}.title`)}
           </div>
           ${field("Text", f.text, `about.features.${i}.text`, "textarea")}
         </div>`).join("");
+  }
+
+  if (tab === "experience") {
+    c.innerHTML = (d.experience || []).map((x, i) => `
+      <div class="admin-item-card">
+        <div class="admin-item-head"><span>Entry ${i + 1}</span>
+          <button class="admin-remove" data-remove="experience.${i}">Remove</button></div>
+        <div class="admin-row">
+          ${field("Role / degree", x.role, `experience.${i}.role`)}
+          ${field("Period (e.g. 2026 — Present)", x.period, `experience.${i}.period`)}
+        </div>
+        ${field("Company / institution", x.company, `experience.${i}.company`)}
+        ${field("Description", x.description, `experience.${i}.description`, "textarea")}
+      </div>`).join("") +
+      `<button class="admin-add" data-add="experience">+ Add experience entry</button>`;
   }
 
   if (tab === "stats") {
@@ -484,8 +546,16 @@ function renderTab(tab) {
           ${field("Tech tags (comma separated)", (p.tags || []).join(", "), `projects.${i}.tags`)}
         </div>
         <div class="admin-row">
-          ${field("Image URL (leave empty for icon card)", p.image, `projects.${i}.image`)}
+          ${field("Image URL (empty = styled icon cover)", p.image, `projects.${i}.image`)}
           ${field("Icon (lucide name)", p.icon, `projects.${i}.icon`)}
+        </div>
+        <div class="admin-row">
+          <div class="admin-field"><label>Cover style (when no image)</label>
+            <select data-path="projects.${i}.gradient">
+              ${[1, 2, 3, 4].map(n =>
+                `<option value="${n}" ${Number(p.gradient) === n ? "selected" : ""}>Gradient ${n}</option>`).join("")}
+            </select></div>
+          <div></div>
         </div>
         <div class="admin-row">
           ${field("Code link", p.codeLink, `projects.${i}.codeLink`)}
@@ -500,13 +570,11 @@ function renderTab(tab) {
       <div class="admin-item-card">
         <div class="admin-item-head"><span>Group ${gi + 1}</span>
           <button class="admin-remove" data-remove="skills.${gi}">Remove group</button></div>
-        ${field("Group title", g.category, `skills.${gi}.category`)}
-        ${g.items.map((item, ii) => `
-          <div class="admin-row">
-            ${field("Skill", item.name, `skills.${gi}.items.${ii}.name`)}
-            ${field("Level %", item.level, `skills.${gi}.items.${ii}.level`, "number")}
-          </div>`).join("")}
-        <button class="admin-add" data-add="skill-item" data-group="${gi}">+ Add skill</button>
+        <div class="admin-row">
+          ${field("Group title", g.category, `skills.${gi}.category`)}
+          ${field("Icon (lucide name)", g.icon, `skills.${gi}.icon`)}
+        </div>
+        ${field("Skills (comma separated)", (g.items || []).join(", "), `skills.${gi}.items`, "textarea")}
       </div>`).join("") +
       `<button class="admin-add" data-add="skill-group">+ Add group</button>`;
   }
@@ -520,12 +588,26 @@ function renderTab(tab) {
           <div class="admin-item-head"><span>Social ${i + 1}</span>
             <button class="admin-remove" data-remove="contact.socials.${i}">Remove</button></div>
           <div class="admin-row">
-            ${field("Icon (github, linkedin, twitter, instagram, mail…)", s.icon, `contact.socials.${i}.icon`)}
+            ${field("Icon (github, linkedin, mail, instagram…)", s.icon, `contact.socials.${i}.icon`)}
             ${field("URL", s.url, `contact.socials.${i}.url`)}
           </div>
         </div>`).join("") +
       `<button class="admin-add" data-add="social">+ Add social link</button>` +
       field("Footer copyright", d.footer.copyright, "footer.copyright");
+  }
+
+  if (tab === "settings") {
+    const currentPalette = (d.settings && d.settings.defaultPalette) || "neon";
+    c.innerHTML =
+      `<div class="admin-field"><label>Default color theme (for new visitors)</label>
+        <select data-path="settings.defaultPalette">
+          ${PALETTES.map(p =>
+            `<option value="${p.key}" ${p.key === currentPalette ? "selected" : ""}>${p.name}</option>`).join("")}
+        </select></div>` +
+      field("Admin passcode (Export mode gate)", d.settings ? d.settings.passcode : "", "settings.passcode") +
+      `<p class="admin-note">This passcode protects the panel before Firebase is connected. It is stored inside the site's data, so treat it as basic protection only.
+      For real security — account login + password reset link sent to your email — connect Firebase (README.md, ~10 minutes).
+      In Live mode, your password is managed by Firebase and is never stored in the site files.</p>`;
   }
 }
 
@@ -537,9 +619,11 @@ function collectTab() {
     for (let i = 0; i < path.length - 1; i++) ref = ref[path[i]];
     const key = path[path.length - 1];
     let val = el.value;
-    if (path[0] === "profile" && key === "typewriter") val = val.split("\n").map(s => s.trim()).filter(Boolean);
-    else if (path[0] === "about" && key === "paragraphs") val = val.split("\n").map(s => s.trim()).filter(Boolean);
-    else if (key === "tags") val = val.split(",").map(s => s.trim()).filter(Boolean);
+    const lineFields = ["names", "roles", "paragraphs"];
+    const commaFields = ["tags", "items"];
+    if (lineFields.includes(key)) val = val.split("\n").map(s => s.trim()).filter(Boolean);
+    else if (commaFields.includes(key)) val = val.split(",").map(s => s.trim()).filter(Boolean);
+    else if (key === "gradient") val = Number(val) || 1;
     else if (el.type === "number") val = Number(val) || 0;
     ref[key] = val;
   });
@@ -551,8 +635,14 @@ function adminMutate(fn) {
   renderTab(activeTab);
 }
 
+function applyWorking() {
+  SITE_DATA = JSON.parse(JSON.stringify(workingData));
+  renderAll();
+  initFilterRebind();
+}
+
 function initAdmin() {
-  // Open triggers: Ctrl+Shift+A, 5 taps on logo, or #admin in the URL
+  // Open triggers
   document.addEventListener("keydown", (e) => {
     if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "a") {
       e.preventDefault();
@@ -573,7 +663,24 @@ function initAdmin() {
     if (e.target === $("admin-overlay")) closeAdmin();
   });
 
-  // Login
+  // Passcode gate (Export mode)
+  $("admin-passcode-btn").addEventListener("click", () => {
+    const entered = $("admin-passcode-input").value;
+    const expected = (SITE_DATA.settings && SITE_DATA.settings.passcode) || "";
+    if (entered === expected && expected !== "") {
+      passcodeUnlocked = true;
+      $("admin-passcode-input").value = "";
+      $("admin-passcode-error").textContent = "";
+      showEditor();
+    } else {
+      $("admin-passcode-error").textContent = "Incorrect passcode.";
+    }
+  });
+  $("admin-passcode-input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") $("admin-passcode-btn").click();
+  });
+
+  // Firebase login
   $("admin-login-btn").addEventListener("click", async () => {
     const email = $("admin-email").value.trim();
     const pass = $("admin-password").value;
@@ -584,6 +691,23 @@ function initAdmin() {
       showToast("Signed in — admin mode active.");
     } catch (err) {
       $("admin-login-error").textContent = "Sign in failed: " + (err.message || err.code);
+    }
+  });
+
+  // Forgot password — sends reset link to the admin email
+  $("admin-forgot").addEventListener("click", async () => {
+    const email = $("admin-email").value.trim();
+    if (!email) {
+      $("admin-login-error").textContent = "Type your email above first, then click reset.";
+      return;
+    }
+    try {
+      await auth.sendPasswordResetEmail(email);
+      $("admin-login-error").textContent = "Reset link sent! Check your inbox (" + email + ").";
+      $("admin-login-error").classList.add("ok");
+    } catch (err) {
+      $("admin-login-error").classList.remove("ok");
+      $("admin-login-error").textContent = "Could not send reset: " + (err.message || err.code);
     }
   });
 
@@ -620,13 +744,16 @@ function initAdmin() {
     adminMutate(() => {
       if (kind === "stat") workingData.stats.push({ value: 0, suffix: "+", label: "New Stat" });
       if (kind === "category") workingData.categories.push({ key: "new", label: "New" });
+      if (kind === "experience") workingData.experience.push({
+        role: "New Role", company: "Company / Institution", period: "2026 — Present",
+        description: "Describe this experience."
+      });
       if (kind === "project") workingData.projects.push({
         title: "New Project", description: "Describe this project.",
         category: workingData.categories[0] ? workingData.categories[0].key : "general",
         tags: [], image: "", icon: "sparkles", gradient: 1, codeLink: "", demoLink: ""
       });
-      if (kind === "skill-group") workingData.skills.push({ category: "New Group", items: [{ name: "Skill", level: 80 }] });
-      if (kind === "skill-item") workingData.skills[Number(addBtn.dataset.group)].items.push({ name: "Skill", level: 80 });
+      if (kind === "skill-group") workingData.skills.push({ icon: "star", category: "New Group", items: ["Skill one", "Skill two"] });
       if (kind === "social") workingData.contact.socials.push({ icon: "link", url: "" });
     });
   });
@@ -639,9 +766,7 @@ function initAdmin() {
     status.classList.remove("ok");
     try {
       await db.collection("site").doc("content").set(workingData);
-      SITE_DATA = JSON.parse(JSON.stringify(workingData));
-      renderAll();
-      initFilterRebind();
+      applyWorking();
       status.textContent = "Saved! The live site is updated for all visitors.";
       status.classList.add("ok");
       showToast("Content published live.");
@@ -653,9 +778,7 @@ function initAdmin() {
   // Export data.js (works with or without Firebase)
   $("admin-export").addEventListener("click", () => {
     collectTab();
-    SITE_DATA = JSON.parse(JSON.stringify(workingData));
-    renderAll();
-    initFilterRebind();
+    applyWorking();
     const file = "const DEFAULT_DATA = " + JSON.stringify(workingData, null, 2) + ";\n";
     const blob = new Blob([file], { type: "text/javascript" });
     const a = document.createElement("a");
@@ -667,36 +790,14 @@ function initAdmin() {
   });
 }
 
-// Re-attach filter listeners after re-render (project grid is rebuilt)
-function initFilterRebind() {
-  const filterBtns = document.querySelectorAll(".filter-btn");
-  const projectCards = document.querySelectorAll(".project-card");
-  filterBtns.forEach(btn => {
-    btn.onclick = () => {
-      filterBtns.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      const filterValue = btn.getAttribute("data-filter");
-      projectCards.forEach(card => {
-        const category = card.getAttribute("data-category");
-        if (filterValue === "all" || category === filterValue) {
-          card.style.display = "flex";
-          setTimeout(() => { card.style.opacity = "1"; card.style.transform = "scale(1)"; }, 50);
-        } else {
-          card.style.opacity = "0";
-          card.style.transform = "scale(0.9)";
-          setTimeout(() => { card.style.display = "none"; }, 300);
-        }
-      });
-    };
-  });
-}
-
 // ==========================================================================
 // Boot
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", async () => {
   initFirebase();
   await loadContent();
+  initTheme();
+  initPalette();
   renderAll();
   initBehaviors();
   initAdmin();

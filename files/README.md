@@ -1,4 +1,4 @@
-# Portfolio with Admin Mode
+# Khadija Zahra — Portfolio with Admin Mode
 
 Same layout and colors as your original files — now fully dynamic with a built-in admin panel.
 
@@ -9,6 +9,9 @@ Same layout and colors as your original files — now fully dynamic with a built
 - Without Firebase, the admin panel runs in **Export mode**: you edit in the panel, click "Download data.js", and replace that one file on your host. No code changes ever.
 
 ## Opening the admin panel
+
+The panel is protected: in Export mode it asks for a passcode (default: `khadija@2026` — change it in the Settings tab). In Live mode it asks for your Firebase email + password, with a "Forgot password" button that emails you a reset link.
+
 
 Any of these:
 1. Press **Ctrl + Shift + A**
@@ -58,3 +61,17 @@ service cloud.firestore {
 ## Adding a project in the future
 
 Open admin → Projects tab → **+ Add project** → fill title, description, category, tags, links → Save (or Download data.js and replace it). That's it — the filter tabs, cards, and animations all update automatically.
+
+## New in this version
+
+- Bilingual hero name typewriter (English + Urdu, editable in admin — one name per line)
+- Rotating roles typewriter
+- Experience & Education timeline section (fully editable)
+- Skill chips instead of percentage bars (comma-separated lists in admin)
+- Light/dark theme toggle (sun/moon button in the nav, remembered per visitor)
+- 4 project cover styles + optional image URL per project
+- Passcode gate (Export mode) and email password-reset (Live mode)
+
+## Color themes
+
+The palette button (next to the sun/moon toggle) cycles four color themes: Bluish Neon (default), Porcelain Blue, Lavender Veil, and Plasma Violet. Each visitor's choice is remembered on their device, each theme has its own tuned light mode, and the Settings tab in admin sets the default theme new visitors see first.
