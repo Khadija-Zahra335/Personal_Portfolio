@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#140A2E"/><stop offset="1" stop-color="#331A6E"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.2" cy="0.25" r="0.7">
+      <stop offset="0" stop-color="#B685F5" stop-opacity="0.4"/><stop offset="1" stop-color="#B685F5" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.4" fill="#CBA9F8" opacity="0.22"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <rect width="800" height="500" fill="url(#dots)"/>
+  <rect width="800" height="500" fill="url(#glow)"/>
+  <rect x="565" y="105" width="150" height="290" rx="26" fill="#1D0F42" stroke="#B685F5" stroke-width="3.5"/>
+  <rect x="600" y="128" width="80" height="8" rx="4" fill="#B685F5" opacity="0.55"/>
+  <circle cx="640" cy="360" r="12" fill="none" stroke="#B685F5" stroke-width="3" opacity="0.7"/>
+  <polyline points="590,255 612,255 624,225 640,285 654,240 668,262 690,262"
+    fill="none" stroke="#5EE1FA" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="70,285 150,285 185,205 235,345 285,175 330,305 370,255 470,255"
+    fill="none" stroke="#C79BFA" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="70,335 160,335 200,290 250,385 300,265 345,360 385,318 470,318"
+    fill="none" stroke="#5EE1FA" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+  <circle cx="285" cy="175" r="9" fill="#E8D4FF"/>
+  <circle cx="235" cy="345" r="6" fill="#5EE1FA"/>
+  <circle cx="110" cy="95" r="5" fill="#C79BFA" opacity="0.8"/>
+  <circle cx="480" cy="120" r="6.5" fill="#5EE1FA" opacity="0.6"/>
+</svg>

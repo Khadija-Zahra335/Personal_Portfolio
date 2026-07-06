@@ -36,14 +36,31 @@ function initFirebase() {
   }
 }
 
-async function loadContent() {
+const CACHE_KEY = "kz-content-cache";
+
+function loadCachedContent() {
+  // Instant paint: use the last content this device saw from the cloud
   if (!firebaseEnabled) return;
   try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) SITE_DATA = Object.assign({}, DEFAULT_DATA, JSON.parse(cached));
+  } catch (e) { /* corrupt cache — ignore */ }
+}
+
+async function fetchCloudContent() {
+  // Background refresh: returns fresh cloud data, or null
+  if (!firebaseEnabled) return null;
+  try {
     const snap = await db.collection("site").doc("content").get();
-    if (snap.exists) SITE_DATA = Object.assign({}, DEFAULT_DATA, snap.data());
+    if (snap.exists) return snap.data();
   } catch (e) {
-    console.warn("Using default data (Firestore read failed):", e);
+    console.warn("Firestore read failed:", e);
   }
+  return null;
+}
+
+function cacheContent(data) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch (e) {}
 }
 
 // ==========================================================================
@@ -63,10 +80,8 @@ function initTheme() {
 // Color palette switcher (persisted; admin can set the default)
 // ==========================================================================
 const PALETTES = [
-  { key: "neon",      name: "Bluish Neon" },
-  { key: "porcelain", name: "Porcelain Blue" },
-  { key: "lavender",  name: "Lavender Veil" },
-  { key: "plasma",    name: "Plasma Violet" }
+  { key: "neon",   name: "Bluish Neon" },
+  { key: "plasma", name: "Plasma Violet" }
 ];
 
 function applyPalette(key) {
@@ -214,8 +229,11 @@ function renderAll() {
 // ==========================================================================
 // Typewriter factory (used for both the name and the roles)
 // ==========================================================================
+let typewriterGeneration = 0;
+
 function makeTypewriter(el, words, opts = {}) {
   if (!el || !words || !words.length) return;
+  const myGeneration = typewriterGeneration;
   const typeSpeed = opts.typeSpeed || 100;
   const deleteSpeed = opts.deleteSpeed || 50;
   const holdTime = opts.holdTime || 2200;
@@ -223,6 +241,7 @@ function makeTypewriter(el, words, opts = {}) {
   let wordIndex = 0, charIndex = 0, isDeleting = false;
 
   function tick() {
+    if (myGeneration !== typewriterGeneration) return; // superseded — stop silently
     const currentWord = words[wordIndex];
     let delay;
     if (isDeleting) {
@@ -294,12 +313,7 @@ function initBehaviors() {
   }
 
   // Dual typewriters: bilingual name (slower, elegant) + rotating roles
-  makeTypewriter($("hero-name-type"), SITE_DATA.profile.names, {
-    typeSpeed: 120, deleteSpeed: 60, holdTime: 3000, gapTime: 600
-  });
-  makeTypewriter($("typewriter"), SITE_DATA.profile.roles, {
-    typeSpeed: 90, deleteSpeed: 45, holdTime: 2000, gapTime: 450
-  });
+  initTypewriters();
 
   // Scroll reveal
   const revealObserver = new IntersectionObserver((entries, observer) => {
@@ -312,8 +326,55 @@ function initBehaviors() {
   }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
   document.querySelectorAll(".scroll-reveal").forEach(el => revealObserver.observe(el));
 
-  // Stats counters
-  const statNumbers = document.querySelectorAll(".stat-number");
+  // Stats counters (re-attachable — survives cloud-refresh re-renders)
+  initStatsCounter();
+
+  initFilterRebind();
+
+  // Contact form — sends a real email via FormSubmit to the address in admin > Contact
+  const contactForm = $("contact-form");
+  if (contactForm) {
+    contactForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formEmail = (SITE_DATA.contact.formEmail || SITE_DATA.about.email || "").trim();
+      const userName = $("name").value;
+      const submitBtn = contactForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `Sending... <i data-lucide="loader" class="btn-icon animate-spin"></i>`;
+      lucide.createIcons();
+      try {
+        const res = await fetch("https://formsubmit.co/ajax/" + encodeURIComponent(formEmail), {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify({
+            name: userName,
+            email: $("email").value,
+            _subject: "Portfolio: " + $("subject").value,
+            message: $("message").value
+          })
+        });
+        if (!res.ok) throw new Error("Request failed");
+        showToast(`Thank you, ${userName}! Your message was sent successfully.`, "success");
+        contactForm.reset();
+      } catch (err) {
+        showToast("Could not send right now — please email " + formEmail + " directly.", "error");
+      }
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalText;
+      lucide.createIcons();
+    });
+  }
+}
+
+let statsObserverRef = null;
+
+function initStatsCounter() {
+  // Kill any previous observer, then watch the (possibly rebuilt) stats section
+  if (statsObserverRef) statsObserverRef.disconnect();
+  const statsSection = document.querySelector(".stats-section");
+  if (!statsSection) return;
+
   const animateStats = (statEl) => {
     const target = parseInt(statEl.getAttribute("data-target"), 10);
     const suffix = statEl.getAttribute("data-suffix") || "";
@@ -330,42 +391,26 @@ function initBehaviors() {
       }
     }, stepTime);
   };
-  const statsSection = document.querySelector(".stats-section");
-  if (statsSection) {
-    const statsObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          statNumbers.forEach(statEl => animateStats(statEl));
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.5 });
-    statsObserver.observe(statsSection);
-  }
 
-  initFilterRebind();
-
-  // Contact form + toast
-  const contactForm = $("contact-form");
-  if (contactForm) {
-    contactForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const nameInput = $("name");
-      const userName = nameInput ? nameInput.value : "there";
-      const submitBtn = contactForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn.innerHTML;
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `Sending... <i data-lucide="loader" class="btn-icon animate-spin"></i>`;
-      lucide.createIcons();
-      setTimeout(() => {
-        showToast(`Thank you, ${userName}! Your message was sent successfully.`, "success");
-        contactForm.reset();
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
-        lucide.createIcons();
-      }, 1200);
+  statsObserverRef = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        document.querySelectorAll(".stat-number").forEach(el => animateStats(el));
+        observer.disconnect();
+      }
     });
-  }
+  }, { threshold: 0.3 });
+  statsObserverRef.observe(statsSection);
+}
+
+function initTypewriters() {
+  typewriterGeneration++; // cancels any running typewriters
+  makeTypewriter($("hero-name-type"), SITE_DATA.profile.names, {
+    typeSpeed: 120, deleteSpeed: 60, holdTime: 3000, gapTime: 600
+  });
+  makeTypewriter($("typewriter"), SITE_DATA.profile.roles, {
+    typeSpeed: 90, deleteSpeed: 45, holdTime: 2000, gapTime: 450
+  });
 }
 
 function initFilterRebind() {
@@ -470,7 +515,13 @@ function renderTab(tab) {
       field("Hero badge text", d.profile.badge, "profile.badge") +
       field("Rotating roles (one per line)", d.profile.roles.join("\n"), "profile.roles", "textarea") +
       field("Hero description / bio", d.profile.heroDescription, "profile.heroDescription", "textarea") +
-      field("Avatar image URL / path", d.profile.avatar, "profile.avatar");
+      field("Avatar image URL / path", d.profile.avatar, "profile.avatar") +
+      `<div class="admin-field"><label>Or upload a new photo (auto-resized)</label>
+        <input type="file" id="avatar-upload" accept="image/*"></div>
+      <div class="admin-field" style="text-align:center;">
+        <img src="${esc(d.profile.avatar)}" alt="Current photo" onerror="this.style.display='none'"
+          style="width:110px;height:110px;border-radius:50%;object-fit:cover;object-position:center 22%;border:2px solid var(--accent-primary);">
+      </div>`;
   }
 
   if (tab === "about") {
@@ -583,6 +634,7 @@ function renderTab(tab) {
     c.innerHTML =
       field("Panel heading", d.contact.heading, "contact.heading") +
       field("Panel text", d.contact.text, "contact.text", "textarea") +
+      field("Form messages go to this email", d.contact.formEmail || d.about.email || "", "contact.formEmail") +
       d.contact.socials.map((s, i) => `
         <div class="admin-item-card">
           <div class="admin-item-head"><span>Social ${i + 1}</span>
@@ -639,6 +691,9 @@ function applyWorking() {
   SITE_DATA = JSON.parse(JSON.stringify(workingData));
   renderAll();
   initFilterRebind();
+  initTypewriters();
+  initStatsCounter();
+  if (firebaseEnabled) cacheContent(SITE_DATA);
 }
 
 function initAdmin() {
@@ -726,6 +781,32 @@ function initAdmin() {
     renderTab(btn.dataset.tab);
   });
 
+  // Photo upload: resize + compress so it fits comfortably in cloud storage
+  $("admin-tab-content").addEventListener("change", (e) => {
+    if (e.target.id !== "avatar-upload") return;
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 640;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUri = canvas.toDataURL("image/jpeg", 0.82);
+        collectTab();
+        workingData.profile.avatar = dataUri;
+        renderTab("profile");
+        showToast("Photo ready — click Save to publish it.");
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
   // Add / remove list items
   $("admin-tab-content").addEventListener("click", (e) => {
     const removeBtn = e.target.closest("[data-remove]");
@@ -795,10 +876,28 @@ function initAdmin() {
 // ==========================================================================
 document.addEventListener("DOMContentLoaded", async () => {
   initFirebase();
-  await loadContent();
+  loadCachedContent();          // instant: last known cloud content (or defaults)
   initTheme();
   initPalette();
   renderAll();
   initBehaviors();
   initAdmin();
+  document.body.classList.remove("booting");   // reveal the page
+
+  // Background refresh from the cloud; re-render only if content changed
+  const fresh = await fetchCloudContent();
+  if (fresh) {
+    const merged = Object.assign({}, DEFAULT_DATA, fresh);
+    if (JSON.stringify(merged) !== JSON.stringify(SITE_DATA)) {
+      SITE_DATA = merged;
+      renderAll();
+      initFilterRebind();
+      initTypewriters();
+      initStatsCounter();
+    }
+    cacheContent(merged);
+  }
 });
+
+// Failsafe: never leave the loader up longer than 4 seconds
+setTimeout(() => document.body.classList.remove("booting"), 4000);

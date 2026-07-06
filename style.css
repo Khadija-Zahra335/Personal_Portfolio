@@ -377,10 +377,11 @@ h1, h2, h3, h4 {
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 4rem;
-  align-items: center;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 3.5rem;
+  align-items: start;
 }
+.hero-visual { padding-top: 3.4rem; }
 
 .hero-content h1 {
   font-size: 4rem;
@@ -650,8 +651,8 @@ h1, h2, h3, h4 {
 
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 2.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
 }
 
 .project-card {
@@ -673,7 +674,7 @@ h1, h2, h3, h4 {
 
 .project-image {
   position: relative;
-  height: 200px;
+  height: 150px;
   overflow: hidden;
   background-color: var(--bg-tertiary);
 }
@@ -711,29 +712,54 @@ h1, h2, h3, h4 {
 .custom-card-bg {
   width: 100%;
   height: 100%;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.92);
+  transition: all var(--transition-slow);
+  overflow: hidden;
+}
+/* dot-grid texture over every cover */
+.custom-card-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1.4px);
+  background-size: 18px 18px;
+  opacity: 0.55;
+}
+/* soft glow orb */
+.custom-card-bg::after {
+  content: "";
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  filter: blur(46px);
+  opacity: 0.55;
+  top: -40px;
+  right: -30px;
+  background: var(--orb, rgba(255, 255, 255, 0.25));
   transition: all var(--transition-slow);
 }
+.project-card:hover .custom-card-bg { transform: scale(1.05); }
+.project-card:hover .custom-card-bg::after { opacity: 0.8; }
 
-.bg-gradient-1 {
-  background: linear-gradient(135deg, #09090e 0%, #1c1328 100%);
-}
-
-.bg-gradient-2 {
-  background: linear-gradient(135deg, #09090e 0%, #0c202d 100%);
-}
-
-.project-card:hover .custom-card-bg {
-  color: var(--accent-primary);
-  transform: scale(1.05);
-}
-
+/* the icon now sits in a frosted badge */
 .bg-icon {
-  width: 60px;
-  height: 60px;
+  width: 30px;
+  height: 30px;
+  position: relative;
+  z-index: 1;
+  box-sizing: content-box;
+  padding: 15px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.35);
 }
 
 .project-content {
@@ -1500,10 +1526,16 @@ h1, h2, h3, h4 {
 
 /* --- Extra project cover gradients --- */
 .bg-gradient-3 {
-  background: linear-gradient(135deg, #0f2027 0%, #2c5364 55%, #00c2b8 100%);
+  background:
+    radial-gradient(circle at 20% 20%, rgba(55, 206, 147, 0.35) 0%, transparent 50%),
+    linear-gradient(135deg, #06231C 0%, #0B4A38 55%, #12876B 100%);
+  --orb: #37CE93;
 }
 .bg-gradient-4 {
-  background: linear-gradient(135deg, #1a1440 0%, #3a2f8f 55%, #4facfe 100%);
+  background:
+    radial-gradient(circle at 80% 80%, rgba(255, 138, 101, 0.35) 0%, transparent 50%),
+    linear-gradient(135deg, #2A1030 0%, #6A2260 55%, #C2455F 100%);
+  --orb: #FF8A65;
 }
 
 /* --- Admin extras --- */
@@ -1697,3 +1729,40 @@ body[data-palette="plasma"]:not(.light) .social-icon-btn:hover {
   box-shadow: 0 0 12px var(--accent-glow);
 }
 .palette-toggle svg { width: 18px; height: 18px; }
+
+
+/* ==========================================================================
+   BOOT LOADER — hides content until real data has rendered (no flash)
+   ========================================================================== */
+.header, main, .footer { transition: opacity 0.35s ease; }
+body.booting .header,
+body.booting main,
+body.booting .footer { opacity: 0; }
+
+#boot-loader {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  transition: opacity 0.4s ease;
+}
+body:not(.booting) #boot-loader { opacity: 0; pointer-events: none; }
+.boot-spinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid var(--border-glass);
+  border-top-color: var(--accent-primary);
+  animation: bootspin 0.9s linear infinite;
+}
+@keyframes bootspin { to { transform: rotate(360deg); } }
+
+
+/* Avatar: keep the face framed regardless of photo aspect ratio */
+.avatar-img {
+  object-fit: cover;
+  object-position: center 22%;
+}

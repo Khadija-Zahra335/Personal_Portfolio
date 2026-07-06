@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="style.css">
 
   <!-- Lucide Icons CDN -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@0.294.0"></script>
 
   <!-- Firebase (compat builds for plain JS) -->
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -27,6 +27,18 @@
   <script src="firebase-config.js"></script>
 </head>
 <body>
+  <!-- Apply saved theme/palette BEFORE first paint, and hide content until data is ready -->
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem("kz-theme") === "light") document.body.classList.add("light");
+        var p = localStorage.getItem("kz-palette");
+        if (p && p !== "neon") document.body.setAttribute("data-palette", p);
+      } catch (e) {}
+      document.body.classList.add("booting");
+    })();
+  </script>
+  <div id="boot-loader"><div class="boot-spinner"></div></div>
 
   <!-- Floating Custom Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>

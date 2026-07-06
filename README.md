@@ -8,6 +8,15 @@ Same layout and colors as your original files — now fully dynamic with a built
 - With Firebase connected, content lives in the cloud instead, and admin edits go live instantly for all visitors.
 - Without Firebase, the admin panel runs in **Export mode**: you edit in the panel, click "Download data.js", and replace that one file on your host. No code changes ever.
 
+## Opening the admin panel
+
+The panel is protected: in Export mode it asks for a passcode (default: `khadija@2026` — change it in the Settings tab). In Live mode it asks for your Firebase email + password, with a "Forgot password" button that emails you a reset link.
+
+
+Any of these:
+1. Press **Ctrl + Shift + A**
+2. **Tap/click the logo 5 times** quickly (works on mobile)
+3. Open the site with **#admin** at the end of the URL (yoursite.com/#admin)
 
 ## Firebase setup (one time, ~10 minutes, free)
 

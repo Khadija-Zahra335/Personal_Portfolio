@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#06231C"/><stop offset="1" stop-color="#0F6B4E"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.4" r="0.65">
+      <stop offset="0" stop-color="#37CE93" stop-opacity="0.35"/><stop offset="1" stop-color="#37CE93" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1.4" fill="#9FE8C8" opacity="0.22"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="500" fill="url(#bg)"/>
+  <rect width="800" height="500" fill="url(#dots)"/>
+  <rect width="800" height="500" fill="url(#glow)"/>
+  <g fill="none" stroke="#6FE3B4" stroke-width="3">
+    <circle cx="400" cy="250" r="140"/>
+    <ellipse cx="400" cy="250" rx="140" ry="52"/>
+    <ellipse cx="400" cy="250" rx="62" ry="140"/>
+    <line x1="260" y1="250" x2="540" y2="250"/>
+  </g>
+  <g stroke="#BDF5DD" stroke-width="2" opacity="0.75">
+    <line x1="400" y1="110" x2="176" y2="120"/>
+    <line x1="540" y1="250" x2="662" y2="150"/>
+    <line x1="462" y1="378" x2="610" y2="402"/>
+    <line x1="270" y1="330" x2="150" y2="392"/>
+  </g>
+  <g fill="#EAFBF2">
+    <circle cx="176" cy="120" r="12"/>
+    <circle cx="662" cy="150" r="15"/>
+    <circle cx="610" cy="402" r="10"/>
+    <circle cx="150" cy="392" r="12"/>
+  </g>
+  <g fill="#37CE93">
+    <circle cx="400" cy="110" r="8"/>
+    <circle cx="540" cy="250" r="8"/>
+    <circle cx="462" cy="378" r="8"/>
+    <circle cx="270" cy="330" r="8"/>
+  </g>
+</svg>
