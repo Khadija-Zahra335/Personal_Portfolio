@@ -1911,14 +1911,21 @@ img, svg, video { max-width: 100%; }
 }
 .logo-mark {
   font-family: 'Noto Nastaliq Urdu', serif;
-  font-size: 1.9rem;
-  line-height: 1.15;
-  padding-bottom: 4px;
+  font-size: 1.45rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
   background: var(--gradient-accent);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #071219;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 10px;   /* optically centers the low Nastaliq baseline */
+  overflow: visible;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px var(--accent-glow);
 }
+body.light .logo-mark { color: #fff; }
 .logo-text {
   display: flex;
   flex-direction: column;
@@ -1939,7 +1946,7 @@ img, svg, video { max-width: 100%; }
   margin-top: 2px;
 }
 @media (max-width: 768px) {
-  .logo-mark { font-size: 1.6rem; }
+  .logo-mark { width: 38px; height: 38px; font-size: 1.25rem; border-radius: 11px; }
   .logo-names { font-size: 0.92rem; }
   .logo-role { font-size: 0.5rem; }
 }
