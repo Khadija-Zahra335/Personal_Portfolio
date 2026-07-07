@@ -1766,3 +1766,99 @@ body:not(.booting) #boot-loader { opacity: 0; pointer-events: none; }
   object-fit: cover;
   object-position: center 22%;
 }
+
+/* ==========================================================================
+   RESPONSIVE POLISH — mobile fixes for all newer components
+   ========================================================================== */
+
+/* Urdu Nastaliq is a tall script — give the name line room so it never clips */
+.hero-name-line {
+  flex-wrap: wrap;
+  min-height: 2.6em;
+  overflow: visible;
+}
+
+@media (max-width: 992px) {
+  /* Image stacks above the text on tablet/mobile — remove desktop offset,
+     center everything, and scale the photo down */
+  .hero-visual {
+    padding-top: 0;
+    justify-content: center;
+  }
+  .hero-content {
+    text-align: center;
+  }
+  .hero-name-line {
+    justify-content: center;
+    font-size: clamp(2.2rem, 9vw, 3rem);
+  }
+  .typewriter-container { font-size: 1.6rem; }
+  .hero-actions { justify-content: center; }
+  .badge { margin-left: auto; margin-right: auto; }
+  .details-list { justify-content: center; }
+  .image-wrapper {
+    width: 230px;
+    height: 230px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Sections breathe less on small screens */
+  .hero-section { padding-top: 6.5rem; }
+  .experience-section,
+  .projects-section,
+  .skills-section,
+  .about-section,
+  .contact-section { padding: 60px 0; }
+
+  .section-title { font-size: 1.9rem; }
+
+  /* Experience timeline: tighter rail and cards */
+  .experience-timeline { padding-left: 22px; }
+  .experience-timeline::before { left: 4px; }
+  .timeline-item { padding: 18px 16px; }
+  .timeline-item::before { left: -24px; width: 10px; height: 10px; }
+  .timeline-item:hover { transform: none; }
+  .timeline-role { font-size: 1.02rem; }
+  .timeline-head { flex-direction: column; gap: 2px; }
+
+  /* Skill chip cards */
+  .skill-chip-card { padding: 20px 16px; }
+  .skill-chips { gap: 7px; }
+  .skill-chip { font-size: 0.78rem; padding: 6px 11px; }
+
+  /* Projects: single comfortable column, slightly shorter covers */
+  .projects-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+  .project-image { height: 165px; }
+  .filter-container { gap: 8px; }
+  .filter-btn { padding: 8px 14px; font-size: 0.82rem; }
+
+  /* Stats: keep three-in-a-row feel but compact */
+  .stats-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .stat-number { font-size: 2.3rem; }
+
+  /* Nav action buttons */
+  .nav-actions { gap: 7px; }
+  .theme-toggle, .palette-toggle, .menu-toggle { width: 36px; height: 36px; }
+
+  /* Toasts shouldn't span past the screen */
+  .toast-container { left: 12px; right: 12px; }
+  .toast { max-width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .container { padding-left: 18px; padding-right: 18px; }
+  .hero-name-line { font-size: clamp(1.9rem, 10vw, 2.4rem); min-height: 2.8em; }
+  .typewriter-container { font-size: 1.3rem; }
+  .hero-description { font-size: 0.95rem; }
+  .image-wrapper { width: 190px; height: 190px; }
+  .btn { padding: 11px 20px; font-size: 0.85rem; }
+  .hero-actions { flex-wrap: wrap; gap: 12px; }
+  .contact-form { padding: 1.4rem; }
+  .admin-panel { padding: 14px; border-radius: 12px; }
+  .admin-tabs { gap: 6px; }
+  .admin-tab { padding: 7px 12px; font-size: 0.78rem; }
+  .admin-tab-content { max-height: 62vh; }
+  .admin-actions .btn { flex: 1; padding: 10px 8px; }
+  .admin-signout { margin-left: 0; }
+}
