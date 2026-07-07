@@ -1768,97 +1768,137 @@ body:not(.booting) #boot-loader { opacity: 0; pointer-events: none; }
 }
 
 /* ==========================================================================
-   RESPONSIVE POLISH — mobile fixes for all newer components
+   RESPONSIVE LAYER — one coherent set of rules (overflow-safe, no cramping)
    ========================================================================== */
 
-/* Urdu Nastaliq is a tall script — give the name line room so it never clips */
-.hero-name-line {
+/* ---------- Global overflow safety (all screen sizes) ---------- */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+.hero-content, .hero-visual, .about-info, .about-cards-grid,
+.project-card, .project-content, .timeline-item, .skill-chip-card,
+.contact-info-panel, .contact-form, .stats-grid, .stat-card {
+  min-width: 0;                 /* grid/flex children may shrink instead of overflowing */
+}
+h1, h2, h3, p, span, a, li { overflow-wrap: break-word; }
+img, svg, video { max-width: 100%; }
+
+/* Rows of pills must always be allowed to wrap */
+.filter-container, .hero-actions, .badge-row, .admin-tabs, .admin-actions,
+.social-links, .tech-tags, .skill-chips {
   flex-wrap: wrap;
-  min-height: 2.6em;
-  overflow: visible;
 }
 
+/* ---------- Urdu (Nastaliq) name: tall script, deep descenders ---------- */
+.hero-name-line {
+  flex-wrap: wrap;
+  align-items: center;
+  min-height: 2.9em;
+  overflow: visible;
+}
+.hero-name-type {
+  display: inline-block;
+  line-height: 1.9;
+  padding-bottom: 0.22em;
+}
+
+/* ---------- Tablet (≤ 992px): stacked hero, centered ---------- */
 @media (max-width: 992px) {
-  /* Image stacks above the text on tablet/mobile — remove desktop offset,
-     center everything, and scale the photo down */
+  .hero-section {
+    padding-top: calc(var(--header-height) + 2rem);
+    min-height: auto;
+    padding-bottom: 4rem;
+  }
   .hero-visual {
     padding-top: 0;
     justify-content: center;
   }
-  .hero-content {
-    text-align: center;
+  .image-wrapper {
+    width: 240px;
+    height: 240px;
   }
+  .hero-content { text-align: center; }
   .hero-name-line {
     justify-content: center;
-    font-size: clamp(2.2rem, 9vw, 3rem);
+    font-size: clamp(2.3rem, 8vw, 3.2rem);
+    min-height: 3em;
   }
-  .typewriter-container { font-size: 1.6rem; }
+  .typewriter-container { font-size: clamp(1.4rem, 5vw, 1.9rem); }
+  .hero-description {
+    margin-left: auto;
+    margin-right: auto;
+  }
   .hero-actions { justify-content: center; }
-  .badge { margin-left: auto; margin-right: auto; }
   .details-list { justify-content: center; }
-  .image-wrapper {
-    width: 230px;
-    height: 230px;
-  }
 }
 
+/* ---------- Phones (≤ 768px): comfortable, not cramped ---------- */
 @media (max-width: 768px) {
-  /* Sections breathe less on small screens */
-  .hero-section { padding-top: 6.5rem; }
-  .experience-section,
-  .projects-section,
-  .skills-section,
-  .about-section,
-  .contact-section { padding: 60px 0; }
+  .container { padding: 0 1.25rem; }
 
-  .section-title { font-size: 1.9rem; }
+  .about-section, .experience-section, .projects-section,
+  .skills-section, .contact-section { padding: 70px 0; }
+  .section-title { font-size: 2rem; }
+  .section-header { margin-bottom: 2.5rem; }
 
-  /* Experience timeline: tighter rail and cards */
-  .experience-timeline { padding-left: 22px; }
-  .experience-timeline::before { left: 4px; }
-  .timeline-item { padding: 18px 16px; }
-  .timeline-item::before { left: -24px; width: 10px; height: 10px; }
+  /* Nav: logo + three buttons must fit on one line */
+  .logo { font-size: 1.25rem; }
+  .nav-actions { gap: 8px; }
+  .theme-toggle, .palette-toggle, .menu-toggle {
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+  }
+
+  /* Timeline: slimmer rail, stacked header, no hover shift */
+  .experience-timeline { padding-left: 24px; }
+  .experience-timeline::before { left: 5px; }
+  .timeline-item { padding: 20px 18px; }
+  .timeline-item::before { left: -25px; }
   .timeline-item:hover { transform: none; }
-  .timeline-role { font-size: 1.02rem; }
-  .timeline-head { flex-direction: column; gap: 2px; }
+  .timeline-head { flex-direction: column; align-items: flex-start; gap: 3px; }
 
-  /* Skill chip cards */
-  .skill-chip-card { padding: 20px 16px; }
-  .skill-chips { gap: 7px; }
-  .skill-chip { font-size: 0.78rem; padding: 6px 11px; }
+  /* Projects: one card per row, roomy */
+  .projects-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .project-image { height: 175px; }
+  .filter-container { gap: 0.7rem; }
 
-  /* Projects: single comfortable column, slightly shorter covers */
-  .projects-grid { grid-template-columns: 1fr; gap: 1.25rem; }
-  .project-image { height: 165px; }
-  .filter-container { gap: 8px; }
-  .filter-btn { padding: 8px 14px; font-size: 0.82rem; }
+  /* Stats readable, not shrunken */
+  .stats-grid { grid-template-columns: 1fr; gap: 1.75rem; }
 
-  /* Stats: keep three-in-a-row feel but compact */
-  .stats-grid { grid-template-columns: 1fr; gap: 1.5rem; }
-  .stat-number { font-size: 2.3rem; }
-
-  /* Nav action buttons */
-  .nav-actions { gap: 7px; }
-  .theme-toggle, .palette-toggle, .menu-toggle { width: 36px; height: 36px; }
-
-  /* Toasts shouldn't span past the screen */
-  .toast-container { left: 12px; right: 12px; }
+  /* Contact + toasts stay inside the screen */
+  .contact-form { padding: 1.75rem 1.4rem; }
+  .toast-container { left: 1rem; right: 1rem; bottom: 1.25rem; }
   .toast { max-width: 100%; }
 }
 
+/* ---------- Small phones (≤ 480px): scale type, keep touch targets ---------- */
 @media (max-width: 480px) {
-  .container { padding-left: 18px; padding-right: 18px; }
-  .hero-name-line { font-size: clamp(1.9rem, 10vw, 2.4rem); min-height: 2.8em; }
-  .typewriter-container { font-size: 1.3rem; }
-  .hero-description { font-size: 0.95rem; }
-  .image-wrapper { width: 190px; height: 190px; }
-  .btn { padding: 11px 20px; font-size: 0.85rem; }
-  .hero-actions { flex-wrap: wrap; gap: 12px; }
-  .contact-form { padding: 1.4rem; }
-  .admin-panel { padding: 14px; border-radius: 12px; }
-  .admin-tabs { gap: 6px; }
-  .admin-tab { padding: 7px 12px; font-size: 0.78rem; }
-  .admin-tab-content { max-height: 62vh; }
-  .admin-actions .btn { flex: 1; padding: 10px 8px; }
+  .container { padding: 0 1.1rem; }
+
+  .hero-name-line {
+    font-size: clamp(1.85rem, 9.5vw, 2.3rem);
+    min-height: 3.2em;
+  }
+  .hero-name-type { line-height: 2; }
+  .typewriter-container { font-size: 1.25rem; }
+  .hero-description { font-size: 0.98rem; }
+  .image-wrapper { width: 200px; height: 200px; }
+
+  /* Buttons keep full touch size; they wrap instead of shrinking */
+  .hero-actions { gap: 0.9rem; }
+  .hero-actions .btn { width: 100%; justify-content: center; }
+
+  .section-title { font-size: 1.75rem; }
+  .stat-number { font-size: 2.4rem; }
+
+  /* Admin panel: usable on a phone without squeezing */
+  .admin-panel { padding: 16px 14px; }
+  .admin-tab { padding: 8px 13px; font-size: 0.8rem; }
+  .admin-tab-content { max-height: 60vh; }
+  .admin-actions { gap: 10px; }
+  .admin-actions .btn { flex: 1 1 45%; min-width: 130px; }
   .admin-signout { margin-left: 0; }
+  .admin-item-card .admin-row { grid-template-columns: 1fr; }
 }
