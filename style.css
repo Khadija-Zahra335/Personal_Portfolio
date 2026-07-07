@@ -1902,3 +1902,44 @@ img, svg, video { max-width: 100%; }
   .admin-signout { margin-left: 0; }
   .admin-item-card .admin-row { grid-template-columns: 1fr; }
 }
+
+/* ===== Logo: bilingual mark (خ + name) ===== */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.logo-mark {
+  font-family: 'Noto Nastaliq Urdu', serif;
+  font-size: 1.9rem;
+  line-height: 1.15;
+  padding-bottom: 4px;
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.12;
+}
+.logo-names {
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+.logo-role {
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+@media (max-width: 768px) {
+  .logo-mark { font-size: 1.6rem; }
+  .logo-names { font-size: 0.92rem; }
+  .logo-role { font-size: 0.5rem; }
+}
