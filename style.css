@@ -469,37 +469,52 @@ h1, h2, h3, h4 {
 /* ==========================================================================
    Stats Bar Section
    ========================================================================== */
-.stats-section {
-  padding: 4rem 0;
-  background-color: var(--bg-secondary);
-  border-top: 1px solid var(--border-glass);
-  border-bottom: 1px solid var(--border-glass);
+.stats-grid{
+    display:flex;
+    align-items:center;
+    overflow:hidden;
+    width:100%;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+.tech-slider{
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    width:max-content;
+    animation:techScroll 28s linear infinite;
 }
 
-.stat-card {
-  text-align: center;
+.tech-slider:hover{
+    animation-play-state:paused;
 }
 
-.stat-number {
-  font-size: 3.5rem;
-  font-weight: 800;
-  color: var(--accent-primary);
-  line-height: 1;
-  margin-bottom: 0.5rem;
+.tech-chip{
+    padding:12px 22px;
+    border-radius:999px;
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--border-glass);
+    color:var(--color-text-primary);
+    font-size:.95rem;
+    font-weight:600;
+    white-space:nowrap;
+    backdrop-filter:blur(12px);
+    transition:.3s ease;
 }
 
-.stat-label {
-  color: var(--color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-size: 0.85rem;
-  font-weight: 500;
+.tech-chip:hover{
+    transform:translateY(-4px);
+    color:var(--accent-primary);
+    border-color:var(--accent-primary);
+    box-shadow:0 8px 24px rgba(0,212,255,.25);
+}
+
+@keyframes techScroll{
+    from{
+        transform:translateX(0);
+    }
+    to{
+        transform:translateX(-50%);
+    }
 }
 
 /* ==========================================================================
