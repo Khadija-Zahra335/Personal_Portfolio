@@ -469,7 +469,7 @@ h1, h2, h3, h4 {
 /* ==========================================================================
    Stats Bar Section
    ========================================================================== */
-.stats-section {
+/* .stats-section {
   padding: 4rem 0;
   background-color: var(--bg-secondary);
   border-top: 1px solid var(--border-glass);
@@ -500,6 +500,55 @@ h1, h2, h3, h4 {
   letter-spacing: 0.1em;
   font-size: 0.85rem;
   font-weight: 500;
+} */
+
+
+.stats-grid{
+    display:flex;
+    align-items:center;
+    overflow:hidden;
+    width:100%;
+}
+
+.tech-slider{
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    width:max-content;
+    animation:techScroll 28s linear infinite;
+}
+
+.tech-slider:hover{
+    animation-play-state:paused;
+}
+
+.tech-chip{
+    padding:12px 22px;
+    border-radius:999px;
+    background:rgba(255,255,255,.05);
+    border:1px solid var(--border-glass);
+    color:var(--color-text-primary);
+    font-size:.95rem;
+    font-weight:600;
+    white-space:nowrap;
+    backdrop-filter:blur(12px);
+    transition:.3s ease;
+}
+
+.tech-chip:hover{
+    transform:translateY(-4px);
+    color:var(--accent-primary);
+    border-color:var(--accent-primary);
+    box-shadow:0 8px 24px rgba(0,212,255,.25);
+}
+
+@keyframes techScroll{
+    from{
+        transform:translateX(0);
+    }
+    to{
+        transform:translateX(-50%);
+    }
 }
 
 /* ==========================================================================
@@ -1901,52 +1950,4 @@ img, svg, video { max-width: 100%; }
   .admin-actions .btn { flex: 1 1 45%; min-width: 130px; }
   .admin-signout { margin-left: 0; }
   .admin-item-card .admin-row { grid-template-columns: 1fr; }
-}
-
-/* ===== Logo: bilingual mark (خ + name) ===== */
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-}
-.logo-mark {
-  font-family: 'Noto Nastaliq Urdu', serif;
-  font-size: 1.45rem;
-  width: 44px;
-  height: 44px;
-  border-radius: 13px;
-  background: var(--gradient-accent);
-  color: #071219;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-bottom: 10px;   /* optically centers the low Nastaliq baseline */
-  overflow: visible;
-  flex-shrink: 0;
-  box-shadow: 0 4px 14px var(--accent-glow);
-}
-body.light .logo-mark { color: #fff; }
-.logo-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.12;
-}
-.logo-names {
-  font-size: 1.02rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  color: var(--color-text-primary);
-}
-.logo-role {
-  font-size: 0.56rem;
-  font-weight: 600;
-  letter-spacing: 0.17em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-  margin-top: 2px;
-}
-@media (max-width: 768px) {
-  .logo-mark { width: 38px; height: 38px; font-size: 1.25rem; border-radius: 11px; }
-  .logo-names { font-size: 0.92rem; }
-  .logo-role { font-size: 0.5rem; }
 }
