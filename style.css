@@ -1023,8 +1023,10 @@ h1, h2, h3, h4 {
 }
 
 .footer-links {
-  display: flex;
-  gap: 2rem;
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .footer-links a:hover {
@@ -1149,11 +1151,16 @@ h1, h2, h3, h4 {
   .contact-form {
     padding: 2rem;
   }
-  .footer-content {
-    flex-direction: column;
-    gap: 1.5rem;
-    text-align: center;
-  }
+ .footer-content {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+
+    .footer-links {
+        gap: 1rem;
+        justify-content: center;
+    }
 }
 
 /* ==========================================================================
