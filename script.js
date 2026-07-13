@@ -242,10 +242,13 @@ function renderAll() {
   // Contact + footer
   $("contact-heading").textContent = d.contact.heading || "";
   $("contact-text").textContent = d.contact.text || "";
-  $("social-links").innerHTML = d.contact.socials.map(s => `
-    <a href="${esc(s.url || "#")}" target="_blank" rel="noopener" class="social-icon-btn" aria-label="${esc(s.icon)}">
+  $("social-links").innerHTML = d.contact.socials.map(s => {
+    const isDirectLink = /^(mailto:|tel:)/.test(s.url || "");
+    const target = isDirectLink ? "" : ` target="_blank" rel="noopener"`;
+    return `<a href="${esc(s.url || "#")}"${target} class="social-icon-btn" aria-label="${esc(s.icon)}">
       <i data-lucide="${esc(s.icon)}"></i>
-    </a>`).join("");
+    </a>`;
+  }).join("");
   $("footer-copy").textContent = d.footer.copyright || "";
 
   lucide.createIcons();
