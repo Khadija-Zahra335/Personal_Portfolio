@@ -128,12 +128,37 @@ function renderAll() {
   document.title = (d.profile.names && d.profile.names[0] ? d.profile.names[0] : "Portfolio") + " | Full Stack Developer";
 
   // Stats
-  $("stats-grid").innerHTML = d.stats.map(s => `
-    <div class="stat-card">
-      <h3 class="stat-number" data-target="${Number(s.value) || 0}" data-suffix="${esc(s.suffix || "")}">0</h3>
-      <p class="stat-label">${esc(s.label)}</p>
-    </div>`).join("");
+  $("stats-grid").innerHTML = `
+<div class="tech-slider">
 
+    <span class="tech-chip">ASP.NET Core</span>
+    <span class="tech-chip">React.js</span>
+    <span class="tech-chip">C#</span>
+    <span class="tech-chip">SQL Server</span>
+    <span class="tech-chip">Entity Framework Core</span>
+    <span class="tech-chip">REST APIs</span>
+    <span class="tech-chip">Git</span>
+    <span class="tech-chip">GitHub</span>
+    <span class="tech-chip">Docker</span>
+    <span class="tech-chip">Tailwind CSS</span>
+    <span class="tech-chip">JavaScript</span>
+
+    <!-- Duplicate for Infinite Animation -->
+
+    <span class="tech-chip">ASP.NET Core</span>
+    <span class="tech-chip">React.js</span>
+    <span class="tech-chip">C#</span>
+    <span class="tech-chip">SQL Server</span>
+    <span class="tech-chip">Entity Framework Core</span>
+    <span class="tech-chip">REST APIs</span>
+    <span class="tech-chip">Git</span>
+    <span class="tech-chip">GitHub</span>
+    <span class="tech-chip">Docker</span>
+    <span class="tech-chip">Tailwind CSS</span>
+    <span class="tech-chip">JavaScript</span>
+
+</div>
+`;
   // About
   $("about-subtitle").textContent = d.about.subtitle || "";
   $("about-title").textContent = d.about.title || "";
