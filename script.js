@@ -610,7 +610,11 @@ function renderTab(tab) {
       d.projects.map((p, i) => `
       <div class="admin-item-card">
         <div class="admin-item-head"><span>Project ${i + 1}</span>
-          <button class="admin-remove" data-remove="projects.${i}">Remove</button></div>
+          <div class="admin-item-actions">
+            <button class="admin-move" data-move-up="projects.${i}" ${i === 0 ? "disabled" : ""} title="Move up">&#8593;</button>
+            <button class="admin-move" data-move-down="projects.${i}" ${i === d.projects.length - 1 ? "disabled" : ""} title="Move down">&#8595;</button>
+            <button class="admin-remove" data-remove="projects.${i}">Remove</button>
+          </div></div>
         ${field("Title", p.title, `projects.${i}.title`)}
         ${field("Description", p.description, `projects.${i}.description`, "textarea")}
         <div class="admin-row">
@@ -832,7 +836,7 @@ function initAdmin() {
     reader.readAsDataURL(file);
   });
 
-  // Add / remove list items
+  // Add / remove / reorder list items
   $("admin-tab-content").addEventListener("click", (e) => {
     const removeBtn = e.target.closest("[data-remove]");
     if (removeBtn) {
@@ -841,6 +845,30 @@ function initAdmin() {
         let ref = workingData;
         for (let i = 0; i < path.length - 2; i++) ref = ref[path[i]];
         ref[path[path.length - 2]].splice(Number(path[path.length - 1]), 1);
+      });
+      return;
+    }
+    const moveUpBtn = e.target.closest("[data-move-up]");
+    if (moveUpBtn) {
+      const path = moveUpBtn.dataset.moveUp.split(".");
+      adminMutate(() => {
+        let ref = workingData;
+        for (let i = 0; i < path.length - 2; i++) ref = ref[path[i]];
+        const arr = ref[path[path.length - 2]];
+        const idx = Number(path[path.length - 1]);
+        if (idx > 0) [arr[idx - 1], arr[idx]] = [arr[idx], arr[idx - 1]];
+      });
+      return;
+    }
+    const moveDownBtn = e.target.closest("[data-move-down]");
+    if (moveDownBtn) {
+      const path = moveDownBtn.dataset.moveDown.split(".");
+      adminMutate(() => {
+        let ref = workingData;
+        for (let i = 0; i < path.length - 2; i++) ref = ref[path[i]];
+        const arr = ref[path[path.length - 2]];
+        const idx = Number(path[path.length - 1]);
+        if (idx < arr.length - 1) [arr[idx], arr[idx + 1]] = [arr[idx + 1], arr[idx]];
       });
       return;
     }
