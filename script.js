@@ -571,7 +571,11 @@ function renderTab(tab) {
     c.innerHTML = (d.experience || []).map((x, i) => `
       <div class="admin-item-card">
         <div class="admin-item-head"><span>Entry ${i + 1}</span>
-          <button class="admin-remove" data-remove="experience.${i}">Remove</button></div>
+          <div class="admin-item-actions">
+            <button class="admin-move" data-move-up="experience.${i}" ${i === 0 ? "disabled" : ""} title="Move up">&#8593;</button>
+            <button class="admin-move" data-move-down="experience.${i}" ${i === (d.experience || []).length - 1 ? "disabled" : ""} title="Move down">&#8595;</button>
+            <button class="admin-remove" data-remove="experience.${i}">Remove</button>
+          </div></div>
         <div class="admin-row">
           ${field("Role / degree", x.role, `experience.${i}.role`)}
           ${field("Period (e.g. 2026 — Present)", x.period, `experience.${i}.period`)}
