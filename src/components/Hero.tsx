@@ -23,9 +23,10 @@ export default function Hero() {
 
         {/* Name + arrow link */}
         <div className="flex items-center gap-3 md:gap-5">
-          <h1 className="text-gradient text-4xl font-semibold leading-tight md:text-6xl md:leading-[1.15]">
-            {profile.firstName} {profile.lastName}
-          </h1>
+         <h1 className="text-4xl font-semibold leading-tight md:text-6xl md:leading-[1.15]">
+  <span className="text-text">{profile.firstName}</span>{" "}
+  <span className="text-text-turnery">{profile.lastName}</span>
+</h1>
           <a
             href={profile.github}
             target="_blank"
