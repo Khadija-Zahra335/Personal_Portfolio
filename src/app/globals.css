@@ -47,16 +47,44 @@
 
 /* The 10 palettes (class on <html>) */
 .theme-1  { --color-bgc:#0f4d62; --color-fgc:#137492; --color-tgc:#0d3c4b; --color-text-turnery:#9ca3af; --color-border:#4e7d92; --color-highlight:#89dff9; --color-card1:#106381; --color-card2:#0d526c; --color-card3:#0a4057; }
-.theme-2  { --color-bgc:#2f4f4f; --color-fgc:#386a6a; --color-tgc:#172a2a; --color-text-turnery:#9ca3af; --color-border:#6b7280; --color-highlight:#a1f0f0; --color-card1:#406060; --color-card2:#354f4f; --color-card3:#2a3f3f; }
+/* .theme-2  { --color-bgc:#2f4f4f; --color-fgc:#386a6a; --color-tgc:#172a2a; --color-text-turnery:#9ca3af; --color-border:#6b7280; --color-highlight:#a1f0f0; --color-card1:#406060; --color-card2:#354f4f; --color-card3:#2a3f3f; }
 .theme-3  { --color-bgc:#5e6673; --color-fgc:#8a94a4; --color-tgc:#3f434d; --color-text-turnery:#c9cdd3; --color-border:#a2acbb; --color-highlight:#d2dbe8; --color-card1:#7c8695; --color-card2:#6d7785; --color-card3:#5f6874; }
 .theme-4  { --color-bgc:#151520; --color-fgc:#1e1e2e; --color-tgc:#595974; --color-text-turnery:#9ca3af; --color-border:#3a3a4d; --color-highlight:#6a6a9e; --color-card1:#202030; --color-card2:#1a1a28; --color-card3:#14141e; }
 .theme-5  { --color-bgc:#3a44a0; --color-fgc:#5562cf; --color-tgc:#2b336f; --color-text-turnery:#9ca3af; --color-border:#727fd9; --color-highlight:#b3c0ff; --color-card1:#4a57b8; --color-card2:#3f4ca1; --color-card3:#343f8a; }
 .theme-6  { --color-bgc:#5e2aa6; --color-fgc:#9747ff; --color-tgc:#3f1e71; --color-text-turnery:#9ca3af; --color-border:#a86bff; --color-highlight:#e0c6ff; --color-card1:#873fdf; --color-card2:#7337bf; --color-card3:#5f2f9f; }
 .theme-7  { --color-bgc:#822f75; --color-fgc:#bd4cab; --color-tgc:#5a2151; --color-text-turnery:#9ca3af; --color-border:#cf6bc0; --color-highlight:#ffc7f5; --color-card1:#a44395; --color-card2:#8e3b80; --color-card3:#78336b; }
 .theme-8  { --color-bgc:#7f5c05; --color-fgc:#d6a11b; --color-tgc:#593f03; --color-text-turnery:#9ca3af; --color-border:#dba518; --color-highlight:#ffe78a; --color-card1:#dba00b; --color-card2:#b78809; --color-card3:#936e07; }
-.theme-9  { --color-bgc:#355b3a; --color-fgc:#2daa50; --color-tgc:#1f3e27; --color-text-turnery:#c3e5c7; --color-border:#52c86e; --color-highlight:#c9f5d3; --color-card1:#2c994a; --color-card2:#257f3e; --color-card3:#1f6632; }
-.theme-10 { --color-bgc:#753c3c; --color-fgc:#db6565; --color-tgc:#5a2a2a; --color-text-turnery:#e4cccc; --color-border:#bf5050; --color-highlight:#ffd2d2; --color-card1:#c95858; --color-card2:#ad4d4d; --color-card3:#8f3f3f; }
-
+.theme-9  { --color-bgc:#355b3a; --color-fgc:#2daa50; --color-tgc:#1f3e27; --color-text-turnery:#c3e5c7; --color-border:#52c86e; --color-highlight:#c9f5d3; --color-card1:#2c994a; --color-card2:#257f3e; --color-card3:#1f6632; } */
+/* .theme-10 { --color-bgc:#753c3c; --color-fgc:#db6565; --color-tgc:#5a2a2a; --color-text-turnery:#e4cccc; --color-border:#bf5050; --color-highlight:#ffd2d2; --color-card1:#c95858; --color-card2:#ad4d4d; --color-card3:#8f3f3f; } */
+/* NexFolio palettes */
+.theme-11 {
+  /* Light: white page, black text, teal accent */
+  --color-bgc: #ffffff;
+  --color-fgc: #f3f9fa;
+  --color-tgc: #e2eef1;
+  --color-text: #0a0a0a;
+  --color-text-secondary: #33383f;
+  --color-text-turnery: #737373;
+  --color-border: #cad1d3;
+  --color-highlight: #1184a7;
+  --color-card1: #eef6f8;
+  --color-card2: #e7f2f5;
+  --color-card3: #dfedf1;
+  --color-white: #0a0a0a; /* flips every hard-coded "white" utility to dark */
+}
+.theme-12 {
+  /* Dark: near-black page, white text, teal accent */
+  --color-bgc: #0a0a0a;
+  --color-fgc: #0b161a;
+  --color-tgc: #13252b;
+  --color-text-secondary: #99a1af;
+  --color-text-turnery: #8b95a3;
+  --color-border: #1e2939;
+  --color-highlight: #1184a7;
+  --color-card1: #0f1d22;
+  --color-card2: #0d191d;
+  --color-card3: #0b1518;
+}
 @layer base {
   html { scroll-behavior: smooth; overflow-x: hidden; }
   body { @apply bg-bgc text-text font-sans antialiased; }
@@ -100,3 +128,17 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ==========================================================================
+   Background variants: HexaFolio themes show the globe video,
+   NexFolio themes (11, 12) show the teal grid instead.
+   ========================================================================== */
+.nex-only { display: none; }
+.theme-11 .nex-only,
+.theme-12 .nex-only { display: block; }
+.theme-11 .hexa-only,
+.theme-12 .hexa-only { display: none; }
+
+/* Teal glow from the top: dark NexFolio only (NexFolio light has no glow) */
+.nex-glow { display: none; }
+.theme-12 .nex-glow { display: block; }

@@ -42,7 +42,7 @@ export default function PaletteSwitcher() {
     setActive(id);
     try {
       localStorage.setItem(THEME_STORAGE_KEY, id);
-    } catch {}
+    } catch { }
   };
 
   return (
@@ -70,8 +70,9 @@ export default function PaletteSwitcher() {
                 className="grid size-8 cursor-pointer place-items-center rounded-md border border-bgc transition hover:scale-110"
                 style={{ backgroundColor: t.swatch }}
               >
-                {active === t.id && <Check className="size-5 text-white" />}
-              </button>
+                {active === t.id && (
+                  <Check className="size-5" style={{ color: "light" in t && t.light ? "#0a0a0a" : "#ffffff" }} />
+                )}              </button>
             ))}
           </motion.div>
         )}
