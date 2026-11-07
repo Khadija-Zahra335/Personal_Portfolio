@@ -27,6 +27,8 @@
   --animate-breathe: breathe 3s ease-in-out infinite;
   --animate-radar: radar 1s ease-out infinite;
     --animate-caret: caret 1s step-end infinite;
+      --animate-swing: swing 5s ease-in-out infinite;
+  --animate-holo: holo 4s linear infinite;
 
   @keyframes shooting {
     0% { opacity: 0; transform: translateX(0) translateY(0) rotate(22.6deg); }
@@ -49,6 +51,15 @@
     @keyframes caret {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
+  }
+
+    @keyframes swing {
+    0%, 100% { transform: rotate(-4deg); }
+    50% { transform: rotate(4deg); }
+  }
+  @keyframes holo {
+    from { background-position: 120% 0; }
+    to { background-position: -120% 0; }
   }
 }
 

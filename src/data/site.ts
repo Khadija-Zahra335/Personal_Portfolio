@@ -10,6 +10,16 @@ export const profile = {
   email: "khadijazahra153@gmail.com",
   github: "https://github.com/Khadija-Zahra335",
   linkedin: "https://www.linkedin.com/in/khadija-zahra-06a37a270/",
+  idCard: {
+    org: "PUCIT",
+    label: "Student ID",
+    monogram: "K",
+    rows: [
+      { label: "Program", value: "BS Software Engineering" },
+      { label: "Year", value: "Final Year" },
+      { label: "Intern", value: "Musketeers Tech '26" },
+    ],
+  },
 };
 
 export const navLinks = [
