@@ -17,8 +17,8 @@ const DEFAULT_DATA = {
       "Creative Problem Solver",
       "Architect of Clean Code"
     ],
-    heroDescription: "Final-year Software Engineering student at PUCIT and Full Stack Intern at Musketeers Tech. I design scalable .NET systems and intelligent ML-powered applications — turning complex requirements into clean, reliable software people enjoy using.",
-    avatar: "assets/avatar.png"
+    heroDescription: "Final-year Software Engineering student at PUCIT and Full Stack Intern at Musketeers Tech. Passionate about building modern web applications with .NET, React, and AI. I enjoy turning real-world problems into clean, user-focused software while continuously improving my engineering skills.",
+    avatar: "assets/avatar-hero.jpg"
   },
   stats: [
     { value: 15, suffix: "+", label: "Projects Built" },
@@ -26,26 +26,13 @@ const DEFAULT_DATA = {
     { value: 94, suffix: "%", label: "Best ML Model Accuracy" }
   ],
   about: {
-    subtitle: "A Bit About Me",
-    title: "Engineering with Precision & Curiosity",
+    subtitle: "About Me",
+    title: "Engineering with precision, curiosity and clean code.",
     paragraphs: [
-      "I'm a final-year BS Software Engineering candidate at PUCIT, University of the Punjab, specializing in full-stack .NET development, machine learning, and software quality assurance. I build systems using modern engineering principles — N-Tier Architecture, MVC, SOLID, and proven design patterns — so they stay maintainable as they grow.",
-      "Beyond writing code, I lead. I managed a 9-member Agile team through a full SDLC delivery, mentor junior students in programming fundamentals and OOP, and love competing in design challenges. Currently, I'm sharpening my production skills as a Full Stack Intern at Musketeers Tech."
+      "Final-year Software Engineering student with hands-on, full-stack experience across modern JavaScript and TypeScript stacks — from backend APIs and database design through to React and Next.js frontends. During a full-stack and AI engineering internship I built three production-style applications from the ground up, working with Node.js, Express, JWT authentication and PostgreSQL with Prisma, and growing into applied AI engineering — LLM integration and retrieval-augmented generation pipelines. End-to-end ownership from planning through deployment has sharpened both my problem-solving and my project management."
     ],
     location: "Layyah, Punjab, Pakistan",
-    email: "khadijazahra153@gmail.com",
-    features: [
-      {
-        icon: "layers",
-        title: "Full Stack Development",
-        text: "ASP.NET Core, MVC, SignalR real-time systems, and SQL Server — from database design to polished, responsive front ends."
-      },
-      {
-        icon: "brain-circuit",
-        title: "Machine Learning & AI",
-        text: "Building and evaluating models with scikit-learn, TensorFlow and Keras — including a 94%-accuracy activity recognition system."
-      }
-    ]
+    email: "khadijazahra153@gmail.com"
   },
   experience: [
     {
@@ -183,7 +170,6 @@ const DEFAULT_DATA = {
     copyright: "© 2026 Khadija Zahra. All rights reserved."
   },
   settings: {
-    passcode: "khadija@2026",
-    defaultPalette: "neon"
+    passcode: "khadija@2026"
   }
 };

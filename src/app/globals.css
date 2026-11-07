@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+/* Design tokens. Swapping the .theme-N class on <html> recolors the site. */
+@theme {
+  
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+
+  /* Default palette = theme-1 (Deep Teal) */
+  --color-bgc: #0f4d62;            /* page background */
+  --color-fgc: #137492;            /* raised surfaces: nav, cards */
+  --color-tgc: #0d3c4b;            /* deep surfaces: pills, buttons */
+  --color-text: #ffffff;
+  --color-text-secondary: #ffffffb3;
+  --color-text-turnery: #9ca3af;   /* tertiary / meta text */
+  --color-border: #4e7d92;
+  --color-highlight: #89dff9;      /* light accent */
+  --color-card1: #106381;
+  --color-card2: #0d526c;
+  --color-card3: #0a4057;
+  --color-green-dot: #31ee33;
+
+  --container-site: 1280px;
+
+  --animate-shooting: shooting 2s linear infinite;
+  --animate-marquee: marquee var(--marquee-duration, 60s) linear infinite;
+  --animate-breathe: breathe 3s ease-in-out infinite;
+  --animate-radar: radar 1s ease-out infinite;
+
+  @keyframes shooting {
+    0% { opacity: 0; transform: translateX(0) translateY(0) rotate(22.6deg); }
+    10% { opacity: 1; }
+    100% { opacity: 0; transform: translateX(600px) translateY(200px) rotate(22.6deg); }
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  @keyframes radar {
+    0% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.5); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+  }
+}
+
+/* The 10 palettes (class on <html>) */
+.theme-1  { --color-bgc:#0f4d62; --color-fgc:#137492; --color-tgc:#0d3c4b; --color-text-turnery:#9ca3af; --color-border:#4e7d92; --color-highlight:#89dff9; --color-card1:#106381; --color-card2:#0d526c; --color-card3:#0a4057; }
+.theme-2  { --color-bgc:#2f4f4f; --color-fgc:#386a6a; --color-tgc:#172a2a; --color-text-turnery:#9ca3af; --color-border:#6b7280; --color-highlight:#a1f0f0; --color-card1:#406060; --color-card2:#354f4f; --color-card3:#2a3f3f; }
+.theme-3  { --color-bgc:#5e6673; --color-fgc:#8a94a4; --color-tgc:#3f434d; --color-text-turnery:#c9cdd3; --color-border:#a2acbb; --color-highlight:#d2dbe8; --color-card1:#7c8695; --color-card2:#6d7785; --color-card3:#5f6874; }
+.theme-4  { --color-bgc:#151520; --color-fgc:#1e1e2e; --color-tgc:#595974; --color-text-turnery:#9ca3af; --color-border:#3a3a4d; --color-highlight:#6a6a9e; --color-card1:#202030; --color-card2:#1a1a28; --color-card3:#14141e; }
+.theme-5  { --color-bgc:#3a44a0; --color-fgc:#5562cf; --color-tgc:#2b336f; --color-text-turnery:#9ca3af; --color-border:#727fd9; --color-highlight:#b3c0ff; --color-card1:#4a57b8; --color-card2:#3f4ca1; --color-card3:#343f8a; }
+.theme-6  { --color-bgc:#5e2aa6; --color-fgc:#9747ff; --color-tgc:#3f1e71; --color-text-turnery:#9ca3af; --color-border:#a86bff; --color-highlight:#e0c6ff; --color-card1:#873fdf; --color-card2:#7337bf; --color-card3:#5f2f9f; }
+.theme-7  { --color-bgc:#822f75; --color-fgc:#bd4cab; --color-tgc:#5a2151; --color-text-turnery:#9ca3af; --color-border:#cf6bc0; --color-highlight:#ffc7f5; --color-card1:#a44395; --color-card2:#8e3b80; --color-card3:#78336b; }
+.theme-8  { --color-bgc:#7f5c05; --color-fgc:#d6a11b; --color-tgc:#593f03; --color-text-turnery:#9ca3af; --color-border:#dba518; --color-highlight:#ffe78a; --color-card1:#dba00b; --color-card2:#b78809; --color-card3:#936e07; }
+.theme-9  { --color-bgc:#355b3a; --color-fgc:#2daa50; --color-tgc:#1f3e27; --color-text-turnery:#c3e5c7; --color-border:#52c86e; --color-highlight:#c9f5d3; --color-card1:#2c994a; --color-card2:#257f3e; --color-card3:#1f6632; }
+.theme-10 { --color-bgc:#753c3c; --color-fgc:#db6565; --color-tgc:#5a2a2a; --color-text-turnery:#e4cccc; --color-border:#bf5050; --color-highlight:#ffd2d2; --color-card1:#c95858; --color-card2:#ad4d4d; --color-card3:#8f3f3f; }
+
+@layer base {
+  html { scroll-behavior: smooth; overflow-x: hidden; }
+  body { @apply bg-bgc text-text font-sans antialiased; }
+  ::selection { background-color: var(--color-highlight); color: var(--color-tgc); }
+}
+
+@utility container-site {
+  width: 100%;
+  max-width: var(--container-site);
+  margin-inline: auto;
+}
+
+/* Fade both horizontal edges (marquee) */
+@utility mask-fade-x {
+  mask-image: linear-gradient(90deg, transparent 0%, #000 12.5%, #000 87.5%, transparent 100%);
+}
+
+/* Fade out towards the bottom (background video) */
+@utility mask-fade-b {
+  mask-image: linear-gradient(#000 0%, #000 25%, transparent 100%);
+}
+
+/* Heavy offset shadow used on section badges */
+@utility shadow-badge {
+  box-shadow: 12px 16px 20px 8px rgb(0 0 0 / 0.25);
+}
+
+/* Gradient headline: white fading to the theme's tertiary tone */
+@utility text-gradient {
+  background-image: linear-gradient(to right, var(--color-text), var(--color-text-turnery));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
