@@ -4,6 +4,7 @@
 @theme {
   
   --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+    --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* Default palette = theme-1 (Deep Teal) */
   --color-bgc: #0f4d62;            /* page background */
@@ -25,6 +26,7 @@
   --animate-marquee: marquee var(--marquee-duration, 60s) linear infinite;
   --animate-breathe: breathe 3s ease-in-out infinite;
   --animate-radar: radar 1s ease-out infinite;
+    --animate-caret: caret 1s step-end infinite;
 
   @keyframes shooting {
     0% { opacity: 0; transform: translateX(0) translateY(0) rotate(22.6deg); }
@@ -43,7 +45,13 @@
     0% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.5); }
     100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
   }
+
+    @keyframes caret {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
 }
+
 
 /* The 10 palettes (class on <html>) */
 .theme-1  { --color-bgc:#0f4d62; --color-fgc:#137492; --color-tgc:#0d3c4b; --color-text-turnery:#9ca3af; --color-border:#4e7d92; --color-highlight:#89dff9; --color-card1:#106381; --color-card2:#0d526c; --color-card3:#0a4057; }
@@ -86,7 +94,11 @@
   --color-card3: #0b1518;
 }
 @layer base {
-  html { scroll-behavior: smooth; overflow-x: hidden; }
+    html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    color-scheme: dark;
+  }
   body { @apply bg-bgc text-text font-sans antialiased; }
   ::selection { background-color: var(--color-highlight); color: var(--color-tgc); }
 }
@@ -145,3 +157,6 @@
 /* Teal glow from the top: dark NexFolio only (NexFolio light has no glow) */
 .nex-glow { display: none; }
 .theme-12 .nex-glow { display: block; }
+
+/* NexFolio Light is the only light palette */
+.theme-11 { color-scheme: light; }

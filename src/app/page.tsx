@@ -29,11 +29,14 @@ export default async function Home() {
 
         <main className="relative z-[1]">
           <Hero />
+          
           <SkillMarquee />
           <Divider />
-          <Projects />
-          <Divider />
           <About />
+          <Divider />
+          <Projects />
+          
+          
           <Divider />
           <TechStack />
           <Divider />

@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { ArrowUpRight, GraduationCap } from "lucide-react";
 import SectionBadge from "@/components/SectionBadge";
 import { useContent } from "@/components/ContentProvider";
+import { TwoTone } from "@/components/SectionHeading";
 
 function AvailabilityDot() {
   return (
@@ -48,15 +49,7 @@ function Visual() {
         <div className="absolute inset-14 rounded-full border border-highlight/15 md:inset-24" />
         <GraduationCap className="relative size-20 text-highlight/90 drop-shadow-xl md:size-32" strokeWidth={1.25} />
       </div>
-
-      {/* Overlapping highlight circle */}
-      <div className="-ml-16 flex size-36 shrink-0 flex-col items-center justify-center gap-1 rounded-full border-4 border-bgc bg-highlight text-center text-bgc md:-ml-24 md:size-56 md:gap-2 md:border-[5px]">
-        <span className="text-2xl font-bold leading-none md:text-4xl">{about.badgeCircle.top}</span>
-        <span className="whitespace-pre-line text-xs font-medium leading-tight md:text-base">
-          {about.badgeCircle.bottom}
-        </span>
-      </div>
-    </div>
+   </div>
   );
 }
 
@@ -76,9 +69,9 @@ export default function About() {
         >
           <SectionBadge className="mb-4">{about.badge}</SectionBadge>
 
-          <h2 className="text-gradient mb-3 max-w-2xl text-3xl font-semibold leading-9 md:text-5xl md:leading-[1.25]">
-            {about.title}
-          </h2>
+          <h2 className="mb-3 max-w-2xl text-3xl font-semibold leading-9 md:text-5xl md:leading-[1.25]">
+  <TwoTone text={about.title} />
+</h2>
 
           <p className="max-w-xl text-sm leading-relaxed text-text-secondary md:text-base">{about.text}</p>
 

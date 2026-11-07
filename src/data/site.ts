@@ -138,20 +138,24 @@ export const projects: Project[] = [
 /* ==========================================================================
    About
    ========================================================================== */
+/* ==========================================================================
+   About
+   ========================================================================== */
 export const about = {
   badge: "About Me",
   title: "Engineering Student, Builder at Heart",
   text:
-    "I'm a final-year BS Software Engineering student at PUCIT, University of the Punjab. I learn by building — from backend APIs and database design to React/Next.js frontends and AI features with LLMs and RAG. I've led a 9-member team through a full SDLC, mentored juniors in programming and OOP, and recently completed a full-stack & AI engineering internship at Musketeers Tech.",
+    "I learn best by building. Every concept from class turns into something I can run — an API, a dashboard, a chatbot. I like clean data models, validated inputs and interfaces that stay simple as features grow, and lately I've been most excited about applied AI: getting LLMs to answer from real data instead of guessing. Outside my own code, I enjoy helping juniors get unstuck and keeping a team organized.",
   stats: [
-    { value: "15+", label: "Projects Built" },
+    { value: "10+", label: "Projects Built" },
     { value: "9", label: "Member Team Led" },
-    { value: "94%", label: "Best ML Accuracy" },
+    { value: "5+", label: "Certifications" },
   ],
   availability: "Open to internships & junior roles",
-  resumeUrl: "/resume/Khadija_Zahra_Resume.pdf", // put the PDF in public/resume/
+  resumeUrl: "/resume/Khadija_Zahra_Resume.pdf",
   badgeCircle: { top: "Final Year", bottom: "BS Software\nEngineering" },
 };
+
 
 /** 4-column strip under About (HexaFolio's experience row) */
 export const experienceStrip = [
@@ -177,7 +181,7 @@ export type TechCategory = {
 export const techSection = {
   badge: "Tech Stack",
   title: "Tools & Technologies",
-  subtitle: "What I've actually used to build, ship and test my projects — from APIs to AI.",
+  subtitle: "Pick a tab or type a command — this terminal lists what I've actually used to build, ship and test my projects.",
 };
 
 export const techStack: TechCategory[] = [
@@ -302,6 +306,7 @@ export const certifications: EduItem[] = [
 ];
 
 
+
 /* ==========================================================================
    Contact & Footer
    ========================================================================== */
@@ -310,7 +315,7 @@ export const contactSection = {
   title: "Get in touch",
   subtitle: "Have an internship, a role or a project in mind? I'd love to hear from you.",
   cardHeading: "Open to internships, junior roles and collaborations.",
-  location: "Layyah, Punjab, Pakistan",
+  location: "Lahore, Punjab, Pakistan",
 };
 
 export const footer = {
@@ -339,4 +344,7 @@ export const defaultContent = {
   footer,
 };
 
+
+
 export type SiteContent = typeof defaultContent;
+
